@@ -1,7 +1,8 @@
 # Prevent from running this script as root.
 if [ "$(whoami)" == "root" ]; then
-		echo "[ FAIL ] Do NOT run this script as root!"
-		exit 1
+                printf "[ \033[0;31mFAIL\033[0m ] \033[01;33mDo NOT run this script as root!\n"
+                printf "         Switch to the dayz user!\033[0m\n"
+                exit 1
 	else
     if [ ! -d "steamcmd" ]; then
       mkdir steamcmd
