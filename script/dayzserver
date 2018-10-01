@@ -151,7 +151,7 @@ fn_update_dayz(){
 	fi
 	if [ -f ".dayzlockfile" ]; then
 		fn_start_dayz
-	fi
+		fi
 }
 
 fn_validate_dayz(){
@@ -165,7 +165,7 @@ fn_validate_dayz(){
 	fi
 	if [ -f ".dayzlockfile" ]; then
 		fn_start_dayz
-	fi
+		fi
 }
 
 fn_backup_dayz(){
@@ -182,7 +182,7 @@ fn_backup_dayz(){
 	fi
 	if [ -f ".dayzlockfile" ]; then
 		fn_start_dayz
-	fi
+		fi
 }
 
 fn_wipe_dayz(){
