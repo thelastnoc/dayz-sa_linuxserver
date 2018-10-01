@@ -29,30 +29,39 @@ fn_checkroot_dayz(){
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
-fn_start_dayz(){
-	if [ -d ".wine64" ]; then
-		printf "[\033[0;32m DayZ \033[0m] Starting server...\n"
-		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
-	else
-	fn_fstartfix_dayz
-	fi
-}
-
-fn_stop_dayz(){
-	tmux send-keys C-c -t dayzserver > /dev/null 2>&1
-}
-
-fn_fstartfix_dayz(){
-	printf "[ \033[01;33mINFO\033[0m ] The first start of the server may freeze!\n         Please start the server again with \033[0;32m./start_dayz.sh\033[0m\n"
-	fn_start_dayz
-	sleep 5
-	killall -u dayz && sleep 5
-}
-
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
 	if [ "{dayzstatus}" == "1" ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
+		exit 1
+	fi
+}
+
+fn_fstartfix_dayz(){
+	printf "[${yellow} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./start_dayz.sh${default}"
+	sleep 5
+	killall -u dayz
+}
+
+fn_start_dayz(){
+fn_status_dayz
+if [! -d ".wine64" ]; then
+	firststart=1
+fi
+printf "[${yellow} DayZ ${default}] Starting server...\n"
+tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+if [ "{firststart}" == "1"]; then
+	fn_fstartfix_dayz
+fi
+}
+
+fn_stop_dayz(){
+	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+	if [ "{dayzstatus}" == "1" ]; then
+		printf "[ ${yellow}DayZ${default} ] Stopping Server gracefully.\n"
+		tmux send-keys C-c -t dayzserver > /dev/null 2>&1
+	else
+		printf "[ ${yellow}DayZ${default} ] Server not running.\n"
 	fi
 }
 
@@ -82,8 +91,8 @@ fn_install_dayz(){
 
 fn_update_dayz(){
 	fn_status_dayz
-	if [ "{dayzstatus}" == "1" ]; then
-	steamcmd/steamcmd.sh +login ${steamusername} +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	if [ "{dayzstatus}" == "0" ]; then
+	steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
 	fi
 }
 
