@@ -148,7 +148,7 @@ fn_update_dayz(){
 		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
 		fn_stop_dayz
 		fn_update_dayz
-		if [ -f ".dayzlockfile" ]; the
+		if [ -f ".dayzlockfile" ]; then
 			fn_start_dayz
 		fi
 	fi
@@ -162,7 +162,7 @@ fn_validate_dayz(){
 		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
 		fn_stop_dayz
 		fn_validate_dayz
-		if [ -f ".dayzlockfile" ]; the
+		if [ -f ".dayzlockfile" ]; then
 			fn_start_dayz
 		fi
 	fi
@@ -179,7 +179,7 @@ fn_backup_dayz(){
 	else
 		fn_stop_dayz
 		fn_backup_dayz
-		if [ -f ".dayzlockfile" ]; the
+		if [ -f ".dayzlockfile" ]; then
 			fn_start_dayz
 		fi
 	fi
