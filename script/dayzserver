@@ -26,11 +26,27 @@ fn_checkroot_dayz(){
 	fi
 }
 
+fn_checktmux(){
+	if [ -n "${TMUX}" ]; then
+		printf "[ ${red}FAIL${default} ] The Script creates a tmux session when starting the server.\n"
+		echo "It is not possible to run a tmux session inside another tmux session"
+		exit 1
+	fi
+}
+
+fn_checkscreen(){
+	if [ -n "${STY}" ]; then
+		printf "[ ${red}FAIL${default} ] The Script creates a tmux session when starting the server.\n"
+		echo "It is not possible to run a tmux session inside screen session"
+		exit 1
+	fi
+}
+
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
 fn_status_dayz(){
-	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
 }
 
 fn_fstartfix_dayz(){
@@ -203,6 +219,8 @@ for i in "${optcommands[@]}"; do
 done
 
 # start functions
+fn_checktmux
+fn_checkscreen
 fn_checkroot_dayz
 # If we're executing this, it means command was not found
 echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
