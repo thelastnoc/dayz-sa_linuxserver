@@ -1,3 +1,8 @@
+###################################################
+# enter below your steam username that owns DayZ! #
+steamusername=username
+###################################################
+# dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
         # echo colors
         default="\e[0m"
@@ -13,7 +18,6 @@ if [ "${ansi}" != "off" ]; then
         creeol="\r\033[K"
 fi
 
-# dayz standalone linuxserver script
 if [ "$(whoami)" == "root" ]; then
   printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
   printf "         Switch to the dayz user!${default}\n"
@@ -23,10 +27,8 @@ fi
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
-dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
-
 fn_start_dayz(){
-tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/test/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
 }
 
 fn_stop_dayz(){
@@ -38,8 +40,20 @@ killall -u dayz
 sleep 5
 }
 
-fn_update_dayz(){
-steamcmd/steamcmd.sh +login username +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+fn_status_dayz(){
+dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+}
+
+fn_monitor_dayz(){
+
+}
+
+fn_testalert_dayz(){
+
+}
+
+fn_console_dayz(){
+tmux a -t dayzserver
 }
 
 fn_install_dayz(){
@@ -55,14 +69,46 @@ if [ ! -d "steamcmd" ]; then
 
 }
 
+fn_update_dayz(){
+steamcmd/steamcmd.sh +login ${steamusername} +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+}
+
+fn_validate_dayz(){
+
+}
+
+fn_backup_dayz(){
+
+}
+
+fn_wipe_dayz(){
+
+}
+
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
-cmd_test_alert=( "ta;test-alert" "command_test_alert.sh" "Send a test alert." )
+cmd_test_alert=( "ta;test-alert" "fn_testalert_dayz" "Send a test alert." )
+cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
+cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
+cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
+cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server." )
+cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data." )
 
 ### Set specific opt here ###
 currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_test_alert[@]}" )
+currentopt+=( "${cmd_console[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+
+### Build list of available commands
+optcommands=()
+index="0"
+for ((index="0"; index < ${#currentopt[@]}; index+=3)); do
+	cmdamount="$(echo "${currentopt[index]}" | awk -F ';' '{ print NF }')"
+	for ((cmdindex=1; cmdindex <= ${cmdamount}; cmdindex++)); do
+		optcommands+=( "$(echo "${currentopt[index]}" | awk -F ';' -v x=${cmdindex} '{ print $x }')" )
+	done
+done
 
 # Shows LinuxGSM usage
 fn_opt_usage(){
@@ -81,10 +127,34 @@ fn_opt_usage(){
                 fi
         done
         } | column -s $'\t' -t
+        exit 1
 #       core_exit.sh
 }
 
+### Check if user commands exist and run corresponding scripts, or display script usage
+if [ -z "${getopt}" ]; then
+	fn_opt_usage
+fi
+# Command exists
+for i in "${optcommands[@]}"; do
+	if [ "${i}" == "${getopt}" ] ; then
+		# Seek and run command
+		index="0"
+		for ((index="0"; index < ${#currentopt[@]}; index+=3)); do
+			currcmdamount="$(echo "${currentopt[index]}" | awk -F ';' '{ print NF }')"
+			for ((currcmdindex=1; currcmdindex <= ${currcmdamount}; currcmdindex++)); do
+				if [ "$(echo "${currentopt[index]}" | awk -F ';' -v x=${currcmdindex} '{ print $x }')" == "${getopt}" ]; then
+					# Run command
+					eval "${currentopt[index+1]}"
+                                        exit 1
+					#core_exit.sh
+					break
+				fi
+			done
+		done
+	fi
+done
 
 # If we're executing this, it means command was not found
-echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
+#echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
 fn_opt_usage
