@@ -1,7 +1,12 @@
-###################################################
-# enter below your steam username that owns DayZ! #
+#############################################
+# enter your steam username that owns DayZ! #
 steamusername=changeusername
-###################################################
+#############################################
+# discord alert function
+discordalert=off
+discordwebhook=""
+##############################################
+
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
         # echo colors
