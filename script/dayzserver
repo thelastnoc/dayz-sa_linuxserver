@@ -78,7 +78,7 @@ fn_console_dayz(){
 }
 
 fn_install_dayz(){
-	if [ ${steamusername}" == "username1234" ]; then
+	if [ "${steamusername}" == "username1234" ]; then
 		nano dayzserver
 		exit 1
 	fi
