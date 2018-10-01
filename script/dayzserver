@@ -26,7 +26,6 @@ fn_checkroot_dayz(){
 	fi
 }
 
-#getopt=$1
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -42,7 +41,7 @@ fn_fstartfix_dayz(){
 
 fn_start_dayz(){
 	fn_status_dayz
-	if [! -d ".wine64" ]; then
+	if [ ! -d ".wine64" ]; then
 		firststart=1
 	fi
 	if [ "${dayzstatus}" == "1" ]; then
@@ -67,6 +66,12 @@ fn_stop_dayz(){
 	fi
 }
 
+fn_restart_dayz(){
+	fn_stop_dayz
+	sleep 5
+	fn_start_dayz
+}
+
 #fn_monitor_dayz(){
 #}
 
@@ -79,7 +84,7 @@ fn_console_dayz(){
 
 fn_install_dayz(){
 	if [ "${steamusername}" == "username1234" ]; then
-		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}\n"
+		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}"
 		sleep 4
 		nano dayzserver
 		exit 1
@@ -95,7 +100,7 @@ fn_install_dayz(){
 		mkdir -v serverfiles
 		fn_update_dayz
 	else
-		printf "[${yellow} INFO ${default}] A server is already installed here."
+		printf "[${yellow} INFO ${default}] A server is already installed.\n"
 	fi
 }
 
