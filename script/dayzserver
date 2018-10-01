@@ -50,8 +50,9 @@ fn_status_dayz(){
 }
 
 fn_fstartfix_dayz(){
-	printf "[${yellow} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./start_dayz.sh${default}"
-	sleep 5
+	printf "[${cyan} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./start_dayz.sh${default}\n"
+	sleep 4
+	rm .dayzlockfile
 	killall -u dayz
 }
 
@@ -66,6 +67,7 @@ fn_start_dayz(){
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
 		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+		date > .dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
 		fn_fstartfix_dayz
@@ -76,11 +78,12 @@ fn_stop_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
-		# waits up to 30 seconds giving the server time to shutdown gracefuly
-		for seconds in {1..30}; do
+		# waits up to 15 seconds giving the server time to shutdown gracefuly
+		for seconds in {1..15}; do
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
 				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
+				rm .dayzlockfile
 				break
 			fi
 			sleep 1
@@ -90,6 +93,7 @@ fn_stop_dayz(){
 		fn_status_dayz
 		if [ "${dayzstatus}" != "0" ]; then
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
+			rm .dayzlockfile
 			sleep 2
 			killall -u dayz
 		fi
@@ -139,21 +143,45 @@ fn_install_dayz(){
 fn_update_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "0" ]; then
-		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
 	else
-		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
-		exit 1
+		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
+		fn_stop_dayz
+		fn_update_dayz
+		if [ -f ".dayzlockfile" ]; the
+			fn_start_dayz
+		fi
 	fi
 }
 
-#fn_validate_dayz(){
-#}
+fn_validate_dayz(){
+	fn_status_dayz
+	if [ "${dayzstatus}" == "0" ]; then
+		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	else
+		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
+		fn_stop_dayz
+		fn_validate_dayz
+		if [ -f ".dayzlockfile" ]; the
+			fn_start_dayz
+		fi
+	fi
+}
 
 fn_backup_dayz(){
-	if [ ! -d "backup" ]; then
-		mkdir -v backup
+	fn_status_dayz
+	if [ "${dayzstatus}" == "0" ]; then
+		if [ ! -d "backup" ]; then
+			mkdir -v backup
+		fi
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder\n"
 		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/*
+	else
+		fn_stop_dayz
+		fn_backup_dayz
+		if [ -f ".dayzlockfile" ]; the
+			fn_start_dayz
+		fi
 	fi
 }
 
