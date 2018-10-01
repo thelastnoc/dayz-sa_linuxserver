@@ -67,7 +67,6 @@ fn_start_dayz(){
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
 		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
-		date > .dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
 		fn_fstartfix_dayz
@@ -83,7 +82,6 @@ fn_stop_dayz(){
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
 				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
-				rm .dayzlockfile
 				break
 			fi
 			sleep 1
@@ -93,7 +91,6 @@ fn_stop_dayz(){
 		fn_status_dayz
 		if [ "${dayzstatus}" != "0" ]; then
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
-			rm .dayzlockfile
 			sleep 2
 			killall -u dayz
 		fi
@@ -150,11 +147,12 @@ fn_update_dayz(){
 		fn_checkusername_dayz
 		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
 	else
-		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
+		date > .dayzlockfile
 		fn_stop_dayz
 		fn_update_dayz
 	fi
 	if [ -f ".dayzlockfile" ]; then
+		rm .dayzlockfile
 		fn_start_dayz
 		fi
 }
@@ -165,11 +163,12 @@ fn_validate_dayz(){
 		fn_checkusername_dayz
 		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
 	else
-		#printf "[ ${yellow}DayZ${default} ] Server is running.\n"
+		date > .dayzlockfile
 		fn_stop_dayz
 		fn_validate_dayz
 	fi
 	if [ -f ".dayzlockfile" ]; then
+		rm .dayzlockfile
 		fn_start_dayz
 		fi
 }
@@ -183,10 +182,12 @@ fn_backup_dayz(){
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder\n"
 		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/*
 	else
+		date > .dayzlockfile
 		fn_stop_dayz
 		fn_backup_dayz
 	fi
 	if [ -f ".dayzlockfile" ]; then
+		rm .dayzlockfile
 		fn_start_dayz
 		fi
 }
