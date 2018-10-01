@@ -1,6 +1,6 @@
 ###################################################
 # enter below your steam username that owns DayZ! #
-steamusername=username
+steamusername=username1234
 ###################################################
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
@@ -26,15 +26,12 @@ fn_checkroot_dayz(){
 	fi
 }
 
+#getopt=$1
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
-	if [ "{dayzstatus}" == "1" ]; then
-		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
-		exit 1
-	fi
 }
 
 fn_fstartfix_dayz(){
@@ -44,40 +41,47 @@ fn_fstartfix_dayz(){
 }
 
 fn_start_dayz(){
-fn_status_dayz
-if [! -d ".wine64" ]; then
-	firststart=1
-fi
-printf "[${yellow} DayZ ${default}] Starting server...\n"
-tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
-if [ "{firststart}" == "1"]; then
-	fn_fstartfix_dayz
-fi
+	fn_status_dayz
+	if [! -d ".wine64" ]; then
+		firststart=1
+	fi
+	if [ "${dayzstatus}" == "1" ]; then
+		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
+		exit 1
+	else
+		printf "[${green} DayZ ${default}] Starting server...\n"
+		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+	fi
+	if [ "${firststart}" == "1" ]; then
+		fn_fstartfix_dayz
+	fi
 }
 
 fn_stop_dayz(){
-	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
-	if [ "{dayzstatus}" == "1" ]; then
-		printf "[ ${yellow}DayZ${default} ] Stopping Server gracefully.\n"
+	fn_status_dayz
+	if [ "${dayzstatus}" == "1" ]; then
+		printf "[ ${magenta}DayZ${default} ] Stopping Server gracefully.\n"
 		tmux send-keys C-c -t dayzserver > /dev/null 2>&1
 	else
 		printf "[ ${yellow}DayZ${default} ] Server not running.\n"
 	fi
 }
 
-fn_monitor_dayz(){
+#fn_monitor_dayz(){
+#}
 
-}
-
-fn_testalert_dayz(){
-
-}
+#fn_testalert_dayz(){
+#}
 
 fn_console_dayz(){
 	tmux a -t dayzserver
 }
 
 fn_install_dayz(){
+	if [ ${steamusername}" == "username1234" ]; then
+		nano dayzserver
+		exit 1
+	fi
 	if [ ! -d "steamcmd" ]; then
 		mkdir steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
@@ -91,18 +95,19 @@ fn_install_dayz(){
 
 fn_update_dayz(){
 	fn_status_dayz
-	if [ "{dayzstatus}" == "0" ]; then
-	steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	if [ "${dayzstatus}" == "0" ]; then
+		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	else
+		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
+		exit 1
 	fi
 }
 
-fn_validate_dayz(){
+#fn_validate_dayz(){
+#}
 
-}
-
-fn_backup_dayz(){
-
-}
+#fn_backup_dayz(){
+#}
 
 fn_wipe_dayz(){
 	printf "[${red} DayZ ${default}] Wiping Players and reset Central Economy state...\n"
@@ -116,6 +121,7 @@ cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
 cmd_test_alert=( "ta;test-alert" "fn_testalert_dayz" "Send a test alert." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
+cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
 cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server." )
@@ -123,7 +129,7 @@ cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data." )
 
 ### Set specific opt here ###
 currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_test_alert[@]}" )
-currentopt+=( "${cmd_console[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+currentopt+=( "${cmd_console[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
 optcommands=()
@@ -155,7 +161,7 @@ fn_opt_usage(){
         exit 1
 #       core_exit.sh
 }
-
+getopt=$1
 ### Check if user commands exist and run corresponding scripts, or display script usage
 if [ -z "${getopt}" ]; then
 	fn_opt_usage
@@ -183,5 +189,5 @@ done
 # start functions
 fn_checkroot_dayz
 # If we're executing this, it means command was not found
-#echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
+echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
 fn_opt_usage
