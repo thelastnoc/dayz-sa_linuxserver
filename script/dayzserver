@@ -79,17 +79,23 @@ fn_console_dayz(){
 
 fn_install_dayz(){
 	if [ "${steamusername}" == "username1234" ]; then
+		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}\n"
+		sleep 4
 		nano dayzserver
 		exit 1
 	fi
 	if [ ! -d "steamcmd" ]; then
-		mkdir steamcmd
+		mkdir -v steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
+	else
+		printf "[${yellow} INFO ${default}] Steamcmd already installed\n"
 	fi
 
 	if [ ! -d "serverfiles" ]; then
-		mkdir serverfiles
+		mkdir -v serverfiles
 		fn_update_dayz
+	else
+		printf "[${yellow} INFO ${default}] A server is already installed here."
 	fi
 }
 
@@ -106,13 +112,18 @@ fn_update_dayz(){
 #fn_validate_dayz(){
 #}
 
-#fn_backup_dayz(){
-#}
+fn_backup_dayz(){
+	if [ ! -d "backup" ]; then
+		mkdir -v backup
+		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder\n"
+		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/*
+	fi
+}
 
 fn_wipe_dayz(){
 	printf "[${red} DayZ ${default}] Wiping Players and reset Central Economy state...\n"
-	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/players.db
-	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/data/*
+	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/players.db 2> /dev/null
+	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/data/* 2> /dev/null
 }
 
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
