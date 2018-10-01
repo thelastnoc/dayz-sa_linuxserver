@@ -19,31 +19,41 @@ if [ "${ansi}" != "off" ]; then
 fi
 
 fn_checkroot_dayz(){
-if [ "$(whoami)" == "root" ]; then
-  printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
-  printf "         Switch to the dayz user!${default}\n"
-  exit 1
-fi
+	if [ "$(whoami)" == "root" ]; then
+	  printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
+	  printf "         Switch to the dayz user!${default}\n"
+	  exit 1
+	fi
 }
 
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
 fn_start_dayz(){
-tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+	if [ -d ".wine64" ]; then
+		printf "[\033[0;32m DayZ \033[0m] Starting server...\n"
+		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+	else
+	fn_fstartfix_dayz
+	fi
 }
 
 fn_stop_dayz(){
-tmux send-keys C-c -t dayzserver > /dev/null 2>&1
+	tmux send-keys C-c -t dayzserver > /dev/null 2>&1
 }
 
 fn_fstartfix_dayz(){
-killall -u dayz
-sleep 5
+	printf "[ \033[01;33mINFO\033[0m ] The first start of the server may freeze!\n         Please start the server again with \033[0;32m./start_dayz.sh\033[0m\n"
+	fn_start_dayz
+	sleep 5
+	killall -u dayz && sleep 5
 }
 
 fn_status_dayz(){
-dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+	dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+	if [ "{dayzstatus}" == "1" ]; then
+		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
+	fi
 }
 
 fn_monitor_dayz(){
@@ -55,24 +65,26 @@ fn_testalert_dayz(){
 }
 
 fn_console_dayz(){
-tmux a -t dayzserver
+	tmux a -t dayzserver
 }
 
 fn_install_dayz(){
-if [ ! -d "steamcmd" ]; then
-      mkdir steamcmd
-      curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
-    fi
+	if [ ! -d "steamcmd" ]; then
+		mkdir steamcmd
+		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
+	fi
 
-    if [ ! -d "serverfiles" ]; then
-      mkdir serverfiles
-      fn_update_dayz
-    fi
-
+	if [ ! -d "serverfiles" ]; then
+		mkdir serverfiles
+		fn_update_dayz
+	fi
 }
 
 fn_update_dayz(){
-steamcmd/steamcmd.sh +login ${steamusername} +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	fn_status_dayz
+	if [ "{dayzstatus}" == "1" ]; then
+	steamcmd/steamcmd.sh +login ${steamusername} +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	fi
 }
 
 fn_validate_dayz(){
@@ -84,7 +96,9 @@ fn_backup_dayz(){
 }
 
 fn_wipe_dayz(){
-
+	printf "[${red} DayZ ${default}] Wiping Players and reset Central Economy state...\n"
+	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/players.db
+	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/data/*
 }
 
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
