@@ -1,1 +1,90 @@
+if [ "${ansi}" != "off" ]; then
+        # echo colors
+        default="\e[0m"
+        red="\e[31m"
+        green="\e[32m"
+        yellow="\e[33m"
+        lightyellow="\e[93m"
+        blue="\e[34m"
+        lightblue="\e[94m"
+        magenta="\e[35m"
+        cyan="\e[36m"
+        # carriage return & erase to end of line
+        creeol="\r\033[K"
+fi
+
 # dayz standalone linuxserver script
+if [ "$(whoami)" == "root" ]; then
+  printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
+  printf "         Switch to the dayz user!${default}\n"
+  exit 1
+fi
+
+export WINEARCH=win64
+export WINEPREFIX=~/.wine64
+
+dayzstatus=$(tmux list-sessions -F dayzserver | grep -Ecx dayzserver)
+
+fn_start_dayz(){
+tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/test/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+}
+
+fn_stop_dayz(){
+tmux send-keys C-c -t dayzserver > /dev/null 2>&1
+}
+
+fn_fstartfix_dayz(){
+killall -u dayz
+sleep 5
+}
+
+fn_update_dayz(){
+steamcmd/steamcmd.sh +login username +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+}
+
+fn_install_dayz(){
+if [ ! -d "steamcmd" ]; then
+      mkdir steamcmd
+      curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
+    fi
+
+    if [ ! -d "serverfiles" ]; then
+      mkdir serverfiles
+      fn_update_dayz
+    fi
+
+}
+
+cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
+cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
+cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
+cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
+cmd_test_alert=( "ta;test-alert" "command_test_alert.sh" "Send a test alert." )
+
+### Set specific opt here ###
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_test_alert[@]}" )
+
+# Shows LinuxGSM usage
+fn_opt_usage(){
+        echo "Usage: $0 [option]"
+        echo -e ""
+        echo "DayZ 0.63 - Linux Game Server"
+        echo -e ""
+        echo -e "${lightyellow}Commands${default}"
+        # Display available commands
+        index="0"
+        {
+        for ((index="0"; index < ${#currentopt[@]}; index+=3)); do
+                # Hide developer commands
+                if [ "${currentopt[index+2]}" != "DEVCOMMAND" ]; then
+                        echo -e "${cyan}$(echo "${currentopt[index]}" | awk -F ';' '{ print $2 }')\t${default}$(echo "${currentopt[index]}" | awk -F ';' '{ print $1 }')\t|${currentopt[index+2]}"
+                fi
+        done
+        } | column -s $'\t' -t
+#       core_exit.sh
+}
+
+
+# If we're executing this, it means command was not found
+echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
+fn_opt_usage
