@@ -18,11 +18,13 @@ if [ "${ansi}" != "off" ]; then
         creeol="\r\033[K"
 fi
 
+fn_checkroot_dayz(){
 if [ "$(whoami)" == "root" ]; then
   printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
   printf "         Switch to the dayz user!${default}\n"
   exit 1
 fi
+}
 
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
@@ -155,6 +157,8 @@ for i in "${optcommands[@]}"; do
 	fi
 done
 
+# start functions
+fn_checkroot_dayz
 # If we're executing this, it means command was not found
 #echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
 fn_opt_usage
