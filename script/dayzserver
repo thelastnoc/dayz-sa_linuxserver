@@ -1,6 +1,6 @@
 ###################################################
 # enter below your steam username that owns DayZ! #
-steamusername=username1234
+steamusername=changeusername
 ###################################################
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
@@ -116,7 +116,7 @@ fn_console_dayz(){
 }
 
 fn_checkusername_dayz(){
-	if [ "${steamusername}" == "username1234" ]; then
+	if [ "${steamusername}" == "changeusername" ]; then
 		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}"
 		sleep 4
 		nano dayzserver
@@ -198,12 +198,18 @@ fn_wipe_dayz(){
 	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/data/* 2> /dev/null
 }
 
+fn_updatescript_dayz(){
+	wget -N https://github.com/thelastnoc/dayz-sa_linuxserver/raw/master/script/dayzserver
+	chmod u+x dayzserver
+}
+
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
 cmd_test_alert=( "ta;test-alert" "fn_testalert_dayz" "Send a test alert." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
+cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Updates this script." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
@@ -212,7 +218,7 @@ cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data." )
 
 ### Set specific opt here ###
 currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_test_alert[@]}" )
-currentopt+=( "${cmd_console[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+currentopt+=( "${cmd_console[@]}" "${cmd_updatescript[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
 optcommands=()
