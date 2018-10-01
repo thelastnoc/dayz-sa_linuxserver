@@ -75,20 +75,22 @@ fn_start_dayz(){
 fn_stop_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "1" ]; then
+		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 30 seconds giving the server time to shutdown gracefuly
 		for seconds in {1..30}; do
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
-				printf "[ ${green}OK${default} ] Stopping Server graceful."
+				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
 				break
 			fi
 			sleep 1
-			printf "[ ${magenta}...${default} ] Stopping Server graceful: ${seconds} seconds"
+			printf "\r[ ${magenta}...${default} ] Stopping Server graceful: ${seconds} seconds"
 			tmux send-keys C-c -t dayzserver > /dev/null 2>&1
 		done
 		fn_status_dayz
 		if [ "${dayzstatus}" != "0" ]; then
-			printf "[ ${green}FAIL${default} ] Stopping Server graceful failed. Sending Killall."
+			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
+			sleep 2
 			killall -u dayz
 		fi
 	else
