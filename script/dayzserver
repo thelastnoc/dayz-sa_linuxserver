@@ -2,7 +2,8 @@
 # enter your steam username that owns DayZ! #
 steamusername=changeusername
 #############################################
-
+### THIS IS WORK IN PROGRESS!
+#############################################
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -249,13 +250,24 @@ fn_opt_usage(){
         done
         } | column -s $'\t' -t
         exit 1
-#       core_exit.sh
 }
+
+# start functions
+fn_checktmux
+fn_checkscreen
+fn_checkroot_dayz
 getopt=$1
-### Check if user commands exist and run corresponding scripts, or display script usage
-if [ -z "${getopt}" ]; then
-	fn_opt_usage
+if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
+	printf "[ ${lightblue} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
+	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
+	exit
+else
+	### Check if user commands exist and run corresponding scripts, or display script usage
+	if [ -z "${getopt}" ]; then
+		fn_opt_usage
+	fi
 fi
+
 # Command exists
 for i in "${optcommands[@]}"; do
 	if [ "${i}" == "${getopt}" ] ; then
@@ -268,7 +280,6 @@ for i in "${optcommands[@]}"; do
 					# Run command
 					eval "${currentopt[index+1]}"
                                         exit 1
-					#core_exit.sh
 					break
 				fi
 			done
@@ -276,16 +287,5 @@ for i in "${optcommands[@]}"; do
 	fi
 done
 
-# start functions
-fn_checktmux
-fn_checkscreen
-fn_checkroot_dayz
 # If we're executing this, it means command was not found
 echo -e "${red}Unknown command${default}: $0 ${getopt}"
-
-if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
-	printf "[ ${lightblue} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
-	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
-else
-	fn_opt_usage
-fi
