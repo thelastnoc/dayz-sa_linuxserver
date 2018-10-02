@@ -124,7 +124,7 @@ fn_console_dayz(){
 
 fn_checkusername_dayz(){
 	if [ "${steamusername}" == "changeusername" ]; then
-		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}"
+		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}\n"
 		sleep 4
 		nano dayzserver
 		exit 1
