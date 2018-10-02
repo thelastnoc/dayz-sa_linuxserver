@@ -204,7 +204,7 @@ fn_wipe_dayz(){
 }
 
 fn_updatescript_dayz(){
-	checkversion=${curl https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version}
+	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
 	if [ ${checkversion} > ${version} ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/dayzserver --show-progress
 		chmod u+x dayzserver
