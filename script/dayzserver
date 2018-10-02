@@ -3,6 +3,7 @@
 steamusername=changeusername
 #############################################
 ### THIS IS WORK IN PROGRESS!
+### This script uses Wine, Xvfb, Tmux
 #############################################
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
@@ -23,7 +24,7 @@ fi
 fn_checkroot_dayz(){
 	if [ "$(whoami)" == "root" ]; then
 	  printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
-	  printf "         Switch to the dayz user!${default}\n"
+	  printf "\tSwitch to the dayz user!${default}\n"
 	  exit 1
 	fi
 }
@@ -31,7 +32,7 @@ fn_checkroot_dayz(){
 fn_checktmux(){
 	if [ -n "${TMUX}" ]; then
 		printf "[ ${red}FAIL${default} ] The Script creates a tmux session when starting the server.\n"
-		echo "It is not possible to run a tmux session inside another tmux session"
+		printf "\tIt is not possible to run a tmux session inside another tmux session\n"
 		exit 1
 	fi
 }
@@ -39,7 +40,7 @@ fn_checktmux(){
 fn_checkscreen(){
 	if [ -n "${STY}" ]; then
 		printf "[ ${red}FAIL${default} ] The Script creates a tmux session when starting the server.\n"
-		echo "It is not possible to run a tmux session inside screen session"
+		printf "\tIt is not possible to run a tmux session inside screen session\n"
 		exit 1
 	fi
 }
@@ -253,9 +254,10 @@ fn_opt_usage(){
 }
 
 # start functions
+fn_checkroot_dayz
 fn_checktmux
 fn_checkscreen
-fn_checkroot_dayz
+
 getopt=$1
 if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
 	printf "[ ${lightblue} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
