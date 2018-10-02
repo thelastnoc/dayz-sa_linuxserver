@@ -2,10 +2,6 @@
 # enter your steam username that owns DayZ! #
 steamusername=changeusername
 #############################################
-# discord alert function
-discordalert=off
-discordwebhook=""
-##############################################
 
 # dayz standalone linuxserver script
 if [ "${ansi}" != "off" ]; then
@@ -285,5 +281,11 @@ fn_checktmux
 fn_checkscreen
 fn_checkroot_dayz
 # If we're executing this, it means command was not found
-echo -e "${red}Unknown command${default}: $0 ${getopt}" exitcode=2
-fn_opt_usage
+echo -e "${red}Unknown command${default}: $0 ${getopt}"
+
+if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
+	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
+	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
+else
+	fn_opt_usage
+fi
