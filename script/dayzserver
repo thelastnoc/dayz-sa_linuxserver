@@ -3,9 +3,10 @@
 steamusername=changeusername
 #############################################
 ### THIS IS WORK IN PROGRESS!
+### DayZ Standalone linuxserver script
 ### This script uses Wine, Xvfb, Tmux
 #############################################
-# dayz standalone linuxserver script
+
 if [ "${ansi}" != "off" ]; then
         # echo colors
         default="\e[0m"
@@ -70,6 +71,7 @@ fn_start_dayz(){
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
 		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+		date > .dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
 		fn_fstartfix_dayz
@@ -85,6 +87,7 @@ fn_stop_dayz(){
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
 				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
+				rm .dayzlockfile
 				break
 			fi
 			sleep 1
@@ -95,6 +98,7 @@ fn_stop_dayz(){
 		if [ "${dayzstatus}" != "0" ]; then
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
 			sleep 2
+			rm .dayzlockfile
 			killall -u dayz
 		fi
 	else
@@ -150,14 +154,13 @@ fn_update_dayz(){
 		fn_checkusername_dayz
 		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
 	else
-		date > .dayzlockfile
+		serverwasrunning=1
 		fn_stop_dayz
 		fn_update_dayz
 	fi
-	if [ -f ".dayzlockfile" ]; then
-		rm .dayzlockfile
+	if [ "${serverwasrunning}" == "1" ]; then
 		fn_start_dayz
-		fi
+	fi
 }
 
 fn_validate_dayz(){
@@ -166,14 +169,13 @@ fn_validate_dayz(){
 		fn_checkusername_dayz
 		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
 	else
-		date > .dayzlockfile
+		serverwasrunning=1
 		fn_stop_dayz
 		fn_validate_dayz
 	fi
-	if [ -f ".dayzlockfile" ]; then
-		rm .dayzlockfile
+	if [ "${serverwasrunning}" == "1" ]; then
 		fn_start_dayz
-		fi
+	fi
 }
 
 fn_backup_dayz(){
@@ -185,14 +187,13 @@ fn_backup_dayz(){
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder\n"
 		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/*
 	else
-		date > .dayzlockfile
+		serverwasrunning=1
 		fn_stop_dayz
 		fn_backup_dayz
 	fi
-	if [ -f ".dayzlockfile" ]; then
-		rm .dayzlockfile
+	if [ "${serverwasrunning}" == "1" ]; then
 		fn_start_dayz
-		fi
+	fi
 }
 
 fn_wipe_dayz(){
@@ -202,7 +203,7 @@ fn_wipe_dayz(){
 }
 
 fn_updatescript_dayz(){
-	wget -N https://github.com/thelastnoc/dayz-sa_linuxserver/raw/master/script/dayzserver
+	wget -N https://github.com/thelastnoc/dayz-sa_linuxserver/raw/master/script/dayzserver 2> /dev/null
 	chmod u+x dayzserver
 }
 
@@ -260,7 +261,7 @@ fn_checkscreen
 
 getopt=$1
 if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
-	printf "[ ${lightblue} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
+	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
 	exit
 else
