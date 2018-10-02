@@ -191,7 +191,6 @@ fn_update_dayz(){
 			fn_runupdate_dayz
 			fn_start_dayz
 		fi
-	fi
 	else
 		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD: No update available\n"
 		printf "\nNo update available:\n"
