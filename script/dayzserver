@@ -46,7 +46,7 @@ fn_checkscreen(){
 	fi
 }
 
-version=1
+version=2
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -149,11 +149,61 @@ fn_install_dayz(){
 	fi
 }
 
+fn_newbuild_dayz(){
+	appid=223350
+	appmanifestfile=~/serverfiles/steamapps/appmanifest_"${appid}".acf
+	printf "[ ... ] Checking for update: SteamCMD"
+	# gets currentbuild
+	currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	# check for new build
+	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamusername}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+	if [ -z "${availablebuild}" ]; then
+		printf "[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
+		sleep 0.5
+		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD: Not returning version info\n"
+		newbuild=0
+		exit
+	else
+		printf "[ ${green}OK${default} ] Checking for update: SteamCMD"
+		sleep 0.5
+	fi
+	# compare builds
+	if [ "${currentbuild}" != "${availablebuild}" ]; then
+		fn_print_ok "Checking for update: SteamCMD: Update available"
+		fn_script_log_pass "Checking for update: SteamCMD: Update available"
+		echo -e "\n"
+		echo -e "Update available:"
+		sleep 0.5
+		printf "\tCurrent build: ${red}${currentbuild}${default}"
+		printf "\tAvailable build: ${green}${availablebuild}${default}"
+		printf "\thttps://steamdb.info/app/${appid}/"
+		sleep 0.5
+		printf "\nApplying update.\r"
+		sleep 1
+		printf "Applying update..\r"
+		sleep 1
+		printf "Applying update...\r"
+		sleep 1
+		printf "\n"
+		newbuild=1
+	else
+		newbuild=0
+		printf "[ ${green}OK${default} ] Checking for update: SteamCMD: No update available"
+		printf "\nNo update available:\n"
+		printf "\tCurrent version: ${green}${currentbuild}${default}\n"
+		printf "\tAvailable version: ${green}${availablebuild}${default}\n"
+		printf "\thttps://steamdb.info/app/${appid}/\n\n"
+	fi
+}
+
 fn_update_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "0" ]; then
 		fn_checkusername_dayz
-		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
+		fn_newbuild_dayz
+		if [ "$(newbuild)" == "1" ]; then
+			~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
+		fi
 	else
 		serverwasrunning=1
 		fn_stop_dayz
