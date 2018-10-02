@@ -236,9 +236,9 @@ done
 
 # Shows LinuxGSM usage
 fn_opt_usage(){
-        echo "Usage: $0 [option]"
         echo -e ""
         echo "DayZ 0.63 - Linux Game Server"
+	echo "${lightblue}Usage: $0 [option]${default}"
         echo -e ""
         echo -e "${lightyellow}Commands${default}"
         # Display available commands
