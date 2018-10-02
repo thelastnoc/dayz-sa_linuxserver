@@ -203,7 +203,7 @@ fn_wipe_dayz(){
 }
 
 fn_updatescript_dayz(){
-	wget -qN https://github.com/thelastnoc/dayz-sa_linuxserver/raw/master/script/dayzserver --show-progress
+	wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/dayzserver --show-progress
 	chmod u+x dayzserver
 }
 
