@@ -158,25 +158,23 @@ fn_newbuild_dayz(){
 	# check for new build
 	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamusername}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
-		printf "[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
+		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
 		sleep 0.5
 		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD: Not returning version info\n"
 		newbuild=0
 		exit
 	else
-		printf "[ ${green}OK${default} ] Checking for update: SteamCMD"
+		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD"
 		sleep 0.5
 	fi
 	# compare builds
 	if [ "${currentbuild}" != "${availablebuild}" ]; then
-		fn_print_ok "Checking for update: SteamCMD: Update available"
-		fn_script_log_pass "Checking for update: SteamCMD: Update available"
-		echo -e "\n"
-		echo -e "Update available:"
+		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD: Update available\n"
+		printf "Update available:\n"
 		sleep 0.5
-		printf "\tCurrent build: ${red}${currentbuild}${default}"
-		printf "\tAvailable build: ${green}${availablebuild}${default}"
-		printf "\thttps://steamdb.info/app/${appid}/"
+		printf "\tCurrent build: ${red}${currentbuild}${default}\n"
+		printf "\tAvailable build: ${green}${availablebuild}${default}\n"
+		printf "\thttps://steamdb.info/app/${appid}/\n"
 		sleep 0.5
 		printf "\nApplying update.\r"
 		sleep 1
@@ -188,7 +186,7 @@ fn_newbuild_dayz(){
 		newbuild=1
 	else
 		newbuild=0
-		printf "[ ${green}OK${default} ] Checking for update: SteamCMD: No update available"
+		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD: No update available\n"
 		printf "\nNo update available:\n"
 		printf "\tCurrent version: ${green}${currentbuild}${default}\n"
 		printf "\tAvailable version: ${green}${availablebuild}${default}\n"
