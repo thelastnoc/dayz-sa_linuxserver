@@ -284,7 +284,7 @@ fn_checkroot_dayz
 echo -e "${red}Unknown command${default}: $0 ${getopt}"
 
 if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ]; then
-	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
+	printf "[ ${lightblue} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
 else
 	fn_opt_usage
