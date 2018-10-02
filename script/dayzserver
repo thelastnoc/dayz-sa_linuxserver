@@ -46,7 +46,7 @@ fn_checkscreen(){
 	fi
 }
 
-version=2
+version=3
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -149,7 +149,8 @@ fn_install_dayz(){
 	fi
 }
 
-fn_newbuild_dayz(){
+fn_update_dayz(){
+	fn_checkusername_dayz
 	appid=223350
 	appmanifestfile=~/serverfiles/steamapps/appmanifest_"${appid}".acf
 	printf "[ ... ] Checking for update: SteamCMD"
@@ -161,7 +162,6 @@ fn_newbuild_dayz(){
 		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
 		sleep 0.5
 		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD: Not returning version info\n"
-		newbuild=0
 		exit
 	else
 		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD"
@@ -176,16 +176,23 @@ fn_newbuild_dayz(){
 		printf "\tAvailable build: ${green}${availablebuild}${default}\n"
 		printf "\thttps://steamdb.info/app/${appid}/\n"
 		sleep 0.5
-		printf "\nApplying update.\r"
-		sleep 1
-		printf "Applying update..\r"
-		sleep 1
-		printf "Applying update...\r"
-		sleep 1
+		printf "\nApplying update"
+		for seconds in {1..3}; do
+			printf "."
+			sleep 1
+		done
 		printf "\n"
-		newbuild=1
+		# run update
+		fn_status_dayz
+		if [ "${dayzstatus}" == "0" ]; then
+			fn_runupdate_dayz
+		else
+			fn_stop_dayz
+			fn_runupdate_dayz
+			fn_start_dayz
+		fi
+	fi
 	else
-		newbuild=0
 		printf "\r[ ${green}OK${default} ] Checking for update: SteamCMD: No update available\n"
 		printf "\nNo update available:\n"
 		printf "\tCurrent version: ${green}${currentbuild}${default}\n"
@@ -194,22 +201,8 @@ fn_newbuild_dayz(){
 	fi
 }
 
-fn_update_dayz(){
-	fn_status_dayz
-	if [ "${dayzstatus}" == "0" ]; then
-		fn_checkusername_dayz
-		fn_newbuild_dayz
-		if [ "$(newbuild)" == "1" ]; then
-			~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
-		fi
-	else
-		serverwasrunning=1
-		fn_stop_dayz
-		fn_update_dayz
-	fi
-	if [ "${serverwasrunning}" == "1" ]; then
-		fn_start_dayz
-	fi
+fn_runupdate_dayz(){
+	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
 }
 
 fn_validate_dayz(){
