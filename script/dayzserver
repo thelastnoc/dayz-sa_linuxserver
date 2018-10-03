@@ -317,7 +317,7 @@ fn_opt_usage(){
 		scriptupdate=" (update available)"
 	fi
         printf "\nDayZ 0.63 - Linux Game Server - Version: "${version}""${scriptupdate}""
-	printf "Usage:${lightblue} $0 [option]${default}\n\n"
+	printf "\nUsage:${lightblue} $0 [option]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
         index="0"
