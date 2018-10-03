@@ -143,7 +143,7 @@ fn_install_dayz(){
 
 	if [ ! -d "serverfiles" ]; then
 		mkdir -v serverfiles
-		fn_update_dayz
+		fn_runupdate_dayz
 	else
 		printf "[${yellow} INFO ${default}] A server is already installed.\n"
 	fi
