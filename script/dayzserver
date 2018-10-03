@@ -132,7 +132,12 @@ fn_console_dayz(){
 	tmux a -t dayzserver
 }
 
-fn_checkusername_dayz(){
+fn_steamlogin_dayz(){
+	if [ ! -f ".dayzserver.cfg" ]
+		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n"
+	else
+		source .dayzserver.cfg
+	fi
 	if [ "${steamlogin}" == "changeusername" ]; then
 		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Steamlogin that owns Dayz!${default}\n"
 		sleep 4
@@ -141,17 +146,8 @@ fn_checkusername_dayz(){
 	fi
 }
 
-fn_steamlogin_dayz(){
-	if [ ! -f ".dayzserver.cfg" ]
-		printf "# Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n
-	else
-		source .dayzserver.cfg
-	fi
-}
-
 fn_install_dayz(){
 	fn_steamlogin_dayz
-	fn_checkusername_dayz
 	if [ ! -d "steamcmd" ]; then
 		mkdir -v steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
@@ -172,7 +168,7 @@ fn_runupdate_dayz(){
 }
 
 fn_update_dayz(){
-	fn_checkusername_dayz
+	fn_steamlogin_dayz
 	appid=223350
 	appmanifestfile=~/serverfiles/steamapps/appmanifest_"${appid}".acf
 	printf "[ ... ] Checking for update: SteamCMD"
@@ -238,8 +234,8 @@ fn_runvalidate_dayz(){
 
 fn_validate_dayz(){
 	fn_status_dayz
+	fn_steamlogin_dayz
 	if [ "${dayzstatus}" == "0" ]; then
-		fn_checkusername_dayz
 		fn_runvalidate_dayz
 	else
 		date > .dayzlockupdate
@@ -322,7 +318,7 @@ fn_opt_usage(){
 	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
 	scriptupdate=""
 	if [ ${checkversion} -gt ${version} ]; then
-		scriptupdate="(update available)"
+		scriptupdate=" (update available)"
 	fi
         printf "\nDayZ 0.63 - Linux Game Server - Version: "${version}" "${scriptupdate}""
 	printf "\nUsage:${lightblue} $0 [option]${default}\n\n"
