@@ -52,6 +52,7 @@ fn_checkscreen(){
 
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
+	sleep 2
 }
 
 fn_fstartfix_dayz(){
@@ -62,16 +63,18 @@ fn_fstartfix_dayz(){
 }
 
 fn_start_dayz(){
-	fn_status_dayz
 	if [ ! -d ".wine64" ]; then
 		firststart=1
 	fi
-	if [ "${dayzstatus}" == "1" ]; then
+	fn_status_dayz
+	if [ "${dayzstatus}" == "1" ] && [ -f ".dayzlockfile" ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
+		sleep 1
 		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+		sleep 1
 		date > .dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
@@ -81,7 +84,7 @@ fn_start_dayz(){
 
 fn_stop_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ]; then
+	if [ "${dayzstatus}" == "1" ] && [ -f ".dayzlockfile" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 15 seconds giving the server time to shutdown gracefuly
 		for seconds in {1..15}; do
@@ -109,7 +112,7 @@ fn_stop_dayz(){
 
 fn_restart_dayz(){
 	fn_stop_dayz
-	sleep 5
+	sleep 3
 	fn_start_dayz
 }
 
@@ -243,19 +246,18 @@ fn_validate_dayz(){
 
 fn_backup_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "0" ]; then
-		if [ ! -d "backup" ]; then
+	if [ ! -d "backup" ]; then
 			mkdir -v backup
-		fi
-		missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	fi
+	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	if [ "${dayzstatus}" == "0" ]; then
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
 		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
 	else
-		serverwasrunning=1
 		fn_stop_dayz
-		fn_backup_dayz
-	fi
-	if [ "${serverwasrunning}" == "1" ]; then
+		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
+		tar -cf ~/backup/${missionfolder}-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
+		sleep 1
 		fn_start_dayz
 	fi
 }
