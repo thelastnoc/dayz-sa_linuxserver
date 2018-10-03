@@ -322,9 +322,9 @@ fn_opt_usage(){
 	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
 	scriptupdate=""
 	if [ ${checkversion} -gt ${version} ]; then
-		scriptupdate=" (update available)"
+		scriptupdate="(update available)"
 	fi
-        printf "\nDayZ 0.63 - Linux Game Server - Version: "${version}""${scriptupdate}""
+        printf "\nDayZ 0.63 - Linux Game Server - Version: "${version}" "${scriptupdate}""
 	printf "\nUsage:${lightblue} $0 [option]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
