@@ -116,8 +116,10 @@ fn_restart_dayz(){
 fn_monitor_dayz(){
 	if [ ! -f ".dayzlockupdate" ]; then
 		fn_status_dayz
-		if [ "${dayzstatus}" == "0"] || [ -f ".dayzlockfile" ]; then
+		if [ "${dayzstatus}" == "0" ] && [ -f ".dayzlockfile" ]; then
 			fn_restart_dayz
+		elif [ "${dayzstatus}" != "0" ] && [ -f ."dayzlockfile" ]; then
+			printf "[ ${yellow}INFO${default} ] Server should be online!\n"
 		else
 			printf "[ ${yellow}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
 		fi
