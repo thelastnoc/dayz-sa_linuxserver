@@ -122,7 +122,7 @@ fn_monitor_dayz(){
 			printf "[ ${yellow}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
 		fi
 	else
-		printf "[ ${yellow}INFO${default} ] Serverfiles being updated\n.
+		printf "[ ${yellow}INFO${default} ] Serverfiles being updated\n."
 	fi
 }
 
