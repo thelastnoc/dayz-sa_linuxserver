@@ -7,7 +7,7 @@ steamusername=changeusername
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=3
+version=4
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -158,6 +158,10 @@ fn_install_dayz(){
 	fi
 }
 
+fn_runupdate_dayz(){
+	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
+}
+
 fn_update_dayz(){
 	fn_checkusername_dayz
 	appid=223350
@@ -169,6 +173,7 @@ fn_update_dayz(){
 	# Removes appinfo.vdf as a fix for not always getting up to date version info from SteamCMD
 	if [ -f "~/Steam/appcache/appinfo.vdf" ]; then
 		rm -f "~/Steam/appcache/appinfo.vdf"
+		sleep 1
 	fi
 	
 	# check for new build
@@ -218,21 +223,20 @@ fn_update_dayz(){
 	fi
 }
 
-fn_runupdate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
+fn_runvalidate_dayz(){
+	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
 }
 
 fn_validate_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "0" ]; then
 		fn_checkusername_dayz
-		~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+		fn_runvalidate_dayz
 	else
-		serverwasrunning=1
+		date > .dayzlockupdate
 		fn_stop_dayz
-		fn_validate_dayz
-	fi
-	if [ "${serverwasrunning}" == "1" ]; then
+		fn_runvalidate_dayz
+		rm -f .dayzlockupdate
 		fn_start_dayz
 	fi
 }
@@ -243,8 +247,9 @@ fn_backup_dayz(){
 		if [ ! -d "backup" ]; then
 			mkdir -v backup
 		fi
-		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder\n"
-		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/*
+		missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
+		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
 	else
 		serverwasrunning=1
 		fn_stop_dayz
@@ -306,11 +311,14 @@ done
 
 # Shows LinuxGSM usage
 fn_opt_usage(){
-        echo -e ""
-        echo "DayZ 0.63 - Linux Game Server"
-	printf "Usage:${lightblue} $0 [option]${default}\n"
-        echo -e ""
-        echo -e "${lightyellow}Commands${default}"
+	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
+	scriptupdate=""
+	if [ ${checkversion} -gt ${version} ]; then
+		scriptupdate=" (update available)"
+	fi
+        printf "\nDayZ 0.63 - Linux Game Server - Version: "${version}""${scriptupdate}""
+	printf "Usage:${lightblue} $0 [option]${default}\n\n"
+        printf "${lightyellow}Commands${default}\n"
         # Display available commands
         index="0"
         {
@@ -362,3 +370,4 @@ done
 
 # If we're executing this, it means command was not found
 echo -e "${red}Unknown command${default}: $0 ${getopt}"
+fn_opt_usage
