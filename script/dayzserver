@@ -165,6 +165,12 @@ fn_update_dayz(){
 	printf "[ ... ] Checking for update: SteamCMD"
 	# gets currentbuild
 	currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	
+	# Removes appinfo.vdf as a fix for not always getting up to date version info from SteamCMD
+	if [ -f "~/Steam/appcache/appinfo.vdf" ]; then
+		rm -f "~/Steam/appcache/appinfo.vdf"
+	fi
+	
 	# check for new build
 	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamusername}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
