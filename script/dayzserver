@@ -338,6 +338,7 @@ getopt=$1
 if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ] && [ "${getopt}" != "install" ]; then
 	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
+	chmod u+x dayzserver
 	exit
 else
 	### Check if user commands exist and run corresponding scripts, or display script usage
