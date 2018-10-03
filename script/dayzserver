@@ -251,14 +251,14 @@ fn_backup_dayz(){
 
 fn_wipe_dayz(){
 	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
-	printf "[${magenta} DayZ ${default}] Wiping Players and reset Central Economy state from Mission: ${missionfolder} in  "
-	for seconds in {1..10}; do
-		printf "${red}\b"${seconds}"${default}"
+	printf "[${red} WARNING ${default}] Wiping Players and reset Central Economy state from...\n"
+	for seconds in {9..0}; do
+		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
 		sleep 1
 	done
 	rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 	rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-	printf "\nPlayer.db and Storage-data wiped!\n"
+	printf "\n[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
 }
 
 fn_updatescript_dayz(){
