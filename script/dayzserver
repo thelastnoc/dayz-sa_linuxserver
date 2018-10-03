@@ -1,13 +1,10 @@
 #############################################
-# enter your steam username that owns DayZ! #
-steamusername=changeusername
-#############################################
 ### THIS IS WORK IN PROGRESS!
 ### DayZ Standalone linuxserver script
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=4
+version=5
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -52,7 +49,7 @@ fn_checkscreen(){
 
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
-	sleep 2
+	sleep 1
 }
 
 fn_fstartfix_dayz(){
@@ -136,15 +133,24 @@ fn_console_dayz(){
 }
 
 fn_checkusername_dayz(){
-	if [ "${steamusername}" == "changeusername" ]; then
-		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Username for Steam that owns Dayz!${default}\n"
+	if [ "${steamlogin}" == "changeusername" ]; then
+		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Steamlogin that owns Dayz!${default}\n"
 		sleep 4
-		nano dayzserver
+		nano .dayzserver.cfg
 		exit 1
 	fi
 }
 
+fn_steamlogin_dayz(){
+	if [ ! -f ".dayzserver.cfg" ]
+		printf "# Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n
+	else
+		source .dayzserver.cfg
+	fi
+}
+
 fn_install_dayz(){
+	fn_steamlogin_dayz
 	fn_checkusername_dayz
 	if [ ! -d "steamcmd" ]; then
 		mkdir -v steamcmd
@@ -162,7 +168,7 @@ fn_install_dayz(){
 }
 
 fn_runupdate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
+	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
 }
 
 fn_update_dayz(){
@@ -180,7 +186,7 @@ fn_update_dayz(){
 	fi
 	
 	# check for new build
-	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamusername}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamlogin}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
 		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
 		sleep 0.5
@@ -227,7 +233,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamusername}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
 }
 
 fn_validate_dayz(){
@@ -257,7 +263,7 @@ fn_backup_dayz(){
 		fn_stop_dayz
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
 		tar -cf ~/backup/${missionfolder}-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
-		sleep 1
+		sleep 0.5
 		fn_start_dayz
 	fi
 }
