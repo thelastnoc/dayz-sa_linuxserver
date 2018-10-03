@@ -250,9 +250,15 @@ fn_backup_dayz(){
 }
 
 fn_wipe_dayz(){
-	printf "[${red} DayZ ${default}] Wiping Players and reset Central Economy state...\n"
-	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/players.db 2> /dev/null
-	rm ~/serverfiles/mpmissions/dayzOffline.chernarusplus/storage_1/data/* 2> /dev/null
+	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	printf "[${magenta} DayZ ${default}] Wiping Players and reset Central Economy state from Mission: ${missionfolder} in  "
+	for seconds in {1..10}; do
+		printf "\b"${seconds}""
+		sleep 1
+	done
+	rm ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db 2> /dev/null
+	rm ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/* 2> /dev/null
+	printf "\nPlayer.db and Storage-data wiped!\n"
 }
 
 fn_updatescript_dayz(){
