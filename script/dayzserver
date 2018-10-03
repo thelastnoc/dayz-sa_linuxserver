@@ -289,7 +289,6 @@ cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
-cmd_test_alert=( "ta;test-alert" "fn_testalert_dayz" "Send a test alert." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
 cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Updates this script." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
@@ -299,7 +298,7 @@ cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server."
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_test_alert[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" )
 currentopt+=( "${cmd_console[@]}" "${cmd_updatescript[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
