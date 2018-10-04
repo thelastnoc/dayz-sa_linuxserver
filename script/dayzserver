@@ -49,7 +49,6 @@ fn_checkscreen(){
 
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
-	sleep 1
 }
 
 fn_fstartfix_dayz(){
