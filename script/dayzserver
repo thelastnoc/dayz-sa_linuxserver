@@ -269,9 +269,19 @@ fn_wipe_dayz(){
 		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
 		sleep 1
 	done
-	rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
-	rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-	printf "\n[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+	if [ "${dayzstatus}" == "0" ]; then
+		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
+		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
+		printf "\n[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+	else
+		fn_stop_dayz
+		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
+		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
+		printf "\n[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+		sleep 0.5
+		fn_start_dayz
+	fi
+	
 }
 
 fn_updatescript_dayz(){
