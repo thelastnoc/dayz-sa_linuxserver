@@ -53,7 +53,7 @@ fn_status_dayz(){
 }
 
 fn_fstartfix_dayz(){
-	printf "[${cyan} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./start_dayz.sh${default}\n"
+	printf "[${cyan} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
 	sleep 4
 	rm .dayzlockfile
 	killall -u dayz
