@@ -142,7 +142,6 @@ fn_steamlogin_dayz(){
 		sleep 4
 		nano .dayzserver.cfg
 		source .dayzserver.cfg
-		exit 1
 	fi
 }
 
