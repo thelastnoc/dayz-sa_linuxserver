@@ -1,6 +1,6 @@
 # WIP
 # the script needs root or sudo privileges
-if [ "$(whoami)" != "root" ] || [ "sudo -v" != "" ]; then
+if [ "$(whoami)" != "root" ]; then
   printf "[ FAIL ] You have to run this script as root!\n"
   exit 1
 fi
