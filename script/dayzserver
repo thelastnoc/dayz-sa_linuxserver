@@ -133,7 +133,7 @@ fn_console_dayz(){
 }
 
 fn_steamlogin_dayz(){
-	if [ ! -f "~/.dayzserver.cfg" ]; then
+	if [ ! -f ".dayzserver.cfg" ]; then
 		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n" | tee ~/.dayzserver.cfg > /dev/null
 	fi
 	source .dayzserver.cfg
@@ -150,14 +150,14 @@ fn_runupdate_dayz(){
 }
 
 fn_install_dayz(){
-	if [ ! -f "~/steamcmd/steamcmd.sh" ]; then
+	if [ ! -f "steamcmd/steamcmd.sh" ]; then
 		mkdir -v steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
 	else
 		printf "[${yellow} INFO ${default}] Steamcmd already installed\n"
 	fi
 	
-	if [ ! -f "~/serverfiles/DayZServer_x64.exe" ]; then
+	if [ ! -f "serverfiles/DayZServer_x64.exe" ]; then
 		mkdir -v serverfiles
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
