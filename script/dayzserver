@@ -5,6 +5,7 @@
 #############################################
 
 version=5
+appid=223350
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
 
@@ -90,9 +91,9 @@ fn_stop_dayz(){
 				rm -f .dayzlockfile
 				break
 			fi
-			sleep 1
 			printf "\r[ ${magenta}...${default} ] Stopping Server graceful: ${seconds} seconds"
 			tmux send-keys C-c -t dayzserver > /dev/null 2>&1
+			sleep 1
 		done
 		fn_status_dayz
 		if [ "${dayzstatus}" != "0" ]; then
@@ -108,7 +109,7 @@ fn_stop_dayz(){
 
 fn_restart_dayz(){
 	fn_stop_dayz
-	sleep 3
+	sleep 1
 	fn_start_dayz
 }
 
@@ -132,7 +133,7 @@ fn_console_dayz(){
 }
 
 fn_steamlogin_dayz(){
-	if [ ! -f ".dayzserver.cfg" ]; then
+	if [ ! -f "~/.dayzserver.cfg" ]; then
 		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n" | tee ~/.dayzserver.cfg > /dev/null
 	fi
 	source .dayzserver.cfg
@@ -144,30 +145,29 @@ fn_steamlogin_dayz(){
 	fi
 }
 
+fn_runupdate_dayz(){
+	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update "${appid}" +quit
+}
+
 fn_install_dayz(){
-	fn_steamlogin_dayz
-	if [ ! -d "steamcmd" ]; then
+	if [ ! -f "~/steamcmd/steamcmd.sh" ]; then
 		mkdir -v steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
 	else
 		printf "[${yellow} INFO ${default}] Steamcmd already installed\n"
 	fi
-
-	if [ ! -d "serverfiles" ]; then
+	
+	if [ ! -f "~/serverfiles/DayZServer_x64.exe" ]; then
 		mkdir -v serverfiles
-		fn_runupdate_dayz
+		fn_steamlogin_dayz
+		fn_runvalidate_dayz
 	else
 		printf "[${yellow} INFO ${default}] A server is already installed.\n"
 	fi
 }
 
-fn_runupdate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 +quit
-}
-
 fn_update_dayz(){
 	fn_steamlogin_dayz
-	appid=223350
 	appmanifestfile=~/serverfiles/steamapps/appmanifest_"${appid}".acf
 	printf "[ ... ] Checking for update: SteamCMD"
 	# gets currentbuild
@@ -227,7 +227,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update 223350 validate +quit
+	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update "${appid}" validate +quit
 }
 
 fn_validate_dayz(){
@@ -297,8 +297,8 @@ cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" )
-currentopt+=( "${cmd_console[@]}" "${cmd_updatescript[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" )
+currentopt+=( "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
 optcommands=()
@@ -334,7 +334,7 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
-if [ ! -d "serverfiles" ] || [ ! -d "steamcmd" ] && [ "${getopt}" != "install" ]; then
+if [ ! -f "~/serverfiles/DayZServer_x64.exe" ] || [ ! -f "~/steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
 	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
 	chmod u+x dayzserver
