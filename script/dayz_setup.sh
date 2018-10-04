@@ -29,4 +29,6 @@ sudo apt update
 sudo apt install --install-recommends winehq-stable xvfb winbind tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc -y
 
 # add a new user for the gameserver
-sudo useradd -m -s /bin/bash dayz && sudo su - dayz
+sudo useradd -m -s /bin/bash dayz
+sleep 0.5
+sudo su - dayz
