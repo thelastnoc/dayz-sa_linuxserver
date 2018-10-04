@@ -134,13 +134,14 @@ fn_console_dayz(){
 
 fn_steamlogin_dayz(){
 	if [ ! -f ".dayzserver.cfg" ]; then
-		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=changeusername\n" | tee ~/.dayzserver.cfg > /dev/null
+		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=\n" | tee ~/.dayzserver.cfg > /dev/null
 	fi
 	source .dayzserver.cfg
-	if [ "${steamlogin}" == "changeusername" ]; then
+	if [ "${steamlogin}" == "" ]; then
 		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Steamlogin that owns Dayz!${default}\n"
 		sleep 4
 		nano .dayzserver.cfg
+		source .dayzserver.cfg
 		exit 1
 	fi
 }
