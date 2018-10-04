@@ -334,7 +334,7 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
-if [ ! -f "~/serverfiles/DayZServer_x64.exe" ] || [ ! -f "~/steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
+if [ ! -f "serverfiles/DayZServer_x64.exe" ] || [ ! -f "steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
 	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
 	chmod u+x dayzserver
