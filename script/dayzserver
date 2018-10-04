@@ -269,6 +269,7 @@ fn_wipe_dayz(){
 		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
 		sleep 1
 	done
+	printf "\n"
 	if [ "${dayzstatus}" == "0" ]; then
 		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
