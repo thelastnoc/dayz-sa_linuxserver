@@ -294,8 +294,8 @@ cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Updates this scrip
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
-cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server." )
-cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data." )
+cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (mpmission)." )
+cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
 
 ### Set specific opt here ###
 currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" )
