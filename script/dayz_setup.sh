@@ -10,7 +10,8 @@ distroid=$(grep ID /etc/os-release | grep -v _ID | grep -v ID_ | sed 's/ID=//g' 
 
 # debian and ubuntu will pass
 if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ]; then
-        wget -nc https://dl.winehq.org/wine-builds/Release.key | sudo apt-key add Release.key
+        wget -nc https://dl.winehq.org/wine-builds/Release.key
+        sudo apt-key add Release.key
         printf "deb https://dl.winehq.org/wine-builds/${distroid}/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.source.list > /dev/null
 else
         printf "[ INFO ] Your Linux Distribution wasn't tested yet.\n"
