@@ -1,8 +1,8 @@
 # WIP
 # the script needs root or sudo privileges
-if [ "$(whoami)" != "root" ]; then
-  printf "[ FAIL ] You have to run this script as root!\n"
-  exit 1
+if [ "$(sudo -v)" != "" ]; then
+        printf "[ FAIL ] You have to run this script as root!\n"
+        exit 1
 fi
 
 sudo dpkg --add-architecture i386
@@ -11,13 +11,13 @@ distroid=$(grep ID /etc/os-release | grep -v _ID | grep -v ID_ | sed 's/ID=//g' 
 
 # debian and ubuntu will pass
 if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ]; then
-  wget -nc https://dl.winehq.org/wine-builds/Release.key | sudo apt-key add Release.key
-  printf "deb https://dl.winehq.org/wine-builds/${distroid}/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.source.list > /dev/null
+        wget -nc https://dl.winehq.org/wine-builds/Release.key | sudo apt-key add Release.key
+        printf "deb https://dl.winehq.org/wine-builds/${distroid}/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.source.list > /dev/null
 else
-  printf " [ INFO ] Your OS / Distribution wasn't tested yet.\n"
+        pprintf " [ INFO ] Your OS / Distribution wasn't tested yet.\n"
 if [ "${distroid}" == "ubuntu" ]; then
-  # ubuntu
-  sudo add-apt-repository universe
+        # ubuntu
+        sudo add-apt-repository universe
 fi
 
 # install required packages
