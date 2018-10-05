@@ -1,3 +1,4 @@
+#!/bin/bash
 # the script needs root or sudo privileges
 if [ "$(sudo -v)" != "" ]; then
         printf "[ FAIL ] You have to run this script as root!\n"
