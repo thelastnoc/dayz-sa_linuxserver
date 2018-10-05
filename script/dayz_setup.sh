@@ -16,7 +16,7 @@ if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ]; then
         sudo apt-key add Release.key
         printf "deb https://dl.winehq.org/wine-builds/${distroid}/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.source.list > /dev/null
 else
-        printf "[ INFO ] Your Linux Distribution wasn't tested yet.\n"
+        printf "[ INFO ] Your Linux Distribution is not tested yet.\n"
 fi
 
 # ubuntu serves needs universe repo
