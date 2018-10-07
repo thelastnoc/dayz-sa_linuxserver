@@ -1,0 +1,9 @@
+##########################
+# Steamlogin #
+##########################
+# Enter your Steamlogin below 
+# to download the Dayz Server-Files.
+# anonymous login isn't working currently because of (no subscription)...
+# eg. steamlogin=mysteamlogin123
+##########################
+steamlogin=
