@@ -5,7 +5,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=7
+version=8
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
@@ -26,6 +26,7 @@ if [ "${ansi}" != "off" ]; then
 fi
 
 fn_checkroot_dayz(){
+	chmod u+x $0
 	if [ "$(whoami)" == "root" ]; then
 	  printf "[ ${red}FAIL${default} ] ${yellow}Do NOT run this script as root!\n"
 	  printf "\tSwitch to the dayz user!${default}\n"
@@ -60,6 +61,19 @@ fn_fstartfix_dayz(){
 	killall -u dayz
 }
 
+fn_loadconfig_dayz(){
+	if [ ! -f ".default.cfg" ]; then
+		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
+	fi
+	if [ ! -f ".dayzserver.cfg" ]; then
+		cp .default.cfg .dayzserver.cfg
+	fi
+	if [ "$(grep dayzparameter .dayzserver.cfg)" == "" ]; then
+                cp .default.cfg .dayzserver.cfg
+        fi
+	source .dayzserver.cfg
+}
+
 fn_start_dayz(){
 	if [ ! -d ".wine64" ]; then
 		firststart=1
@@ -70,9 +84,11 @@ fn_start_dayz(){
 		exit 1
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
-		sleep 1
-		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
-		sleep 1
+		0.5
+		fn_loadconfig_dayz
+		sleep 0.5
+		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe "${dayzparameter}"
+		sleep 0.5
 		date > .dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
@@ -134,15 +150,15 @@ fn_console_dayz(){
 }
 
 fn_steamlogin_dayz(){
-	if [ ! -f ".dayzserver.cfg" ]; then
-		printf "#Enter your Steamlogin below to download the Dayz Server-Files\nsteamlogin=\n" | tee ~/.dayzserver.cfg > /dev/null
+	if [ ! -f ".steamlogin" ]; then
+		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
 	fi
-	source .dayzserver.cfg
+	source .steamlogin
 	if [ "${steamlogin}" == "" ]; then
 		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set. Please Enter your Steamlogin that owns Dayz!${default}\n"
 		sleep 4
-		nano .dayzserver.cfg
-		source .dayzserver.cfg
+		nano .steamlogin
+		source .steamlogin
 	fi
 }
 
@@ -290,16 +306,24 @@ fn_updatescript_dayz(){
 	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
 	if [ ${checkversion} -gt ${version} ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/dayzserver --show-progress
-		chmod u+x dayzserver
+		chmod u+x $0
 	else
 		printf "No update\n"
 	fi
+}
+
+fn_config_dayz(){
+	if [ ! -f ".dayzserver.cfg" ]; then
+		fn_loadconfig_dayz
+	fi
+	nano .dayzserver.cfg
 }
 
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
+cmd_config=( "cfg;config" "fn_config_dayz" "Edit the Script Config." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
 cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Updates this script." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
@@ -309,7 +333,7 @@ cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" )
 currentopt+=( "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
@@ -349,7 +373,7 @@ getopt=$1
 if [ ! -f "serverfiles/DayZServer_x64.exe" ] || [ ! -f "steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
 	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
 	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
-	chmod u+x dayzserver
+	chmod u+x $0
 	exit
 else
 	### Check if user commands exist and run corresponding scripts, or display script usage
