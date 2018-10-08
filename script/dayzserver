@@ -2,6 +2,7 @@
 #############################################
 ### THIS IS WORK IN PROGRESS!
 ### DayZ Standalone linuxserver script
+### maintained by thelastnoc
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
