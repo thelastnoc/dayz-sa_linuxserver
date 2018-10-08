@@ -177,7 +177,7 @@ fn_install_dayz(){
 	else
 		printf "[${yellow} INFO ${default}] Steamcmd already installed\n"
 	fi
-	
+
 	if [ ! -f "serverfiles/DayZServer_x64.exe" ]; then
 		mkdir -v serverfiles
 		fn_steamlogin_dayz
@@ -199,7 +199,7 @@ fn_update_dayz(){
 		rm -f "~/Steam/appcache/appinfo.vdf"
 		sleep 1
 	fi
-	
+
 	# check for new build
 	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamlogin}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
@@ -303,7 +303,6 @@ fn_wipe_dayz(){
 		sleep 0.5
 		fn_start_dayz
 	fi
-	
 }
 
 fn_updatescript_dayz(){
