@@ -316,6 +316,13 @@ fn_updatescript_dayz(){
 	fi
 }
 
+fn_config_dayz(){
+	if [ ! -f ".dayzserver.cfg" ]; then
+		fn_loadconfig_dayz
+	fi
+	nano .dayzserver.cfg
+}
+
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
