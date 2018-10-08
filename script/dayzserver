@@ -85,7 +85,7 @@ fn_start_dayz(){
 		exit 1
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
-		0.5
+		sleep 0.5
 		fn_loadconfig_dayz
 		sleep 0.5
 		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe $dayzparameter
