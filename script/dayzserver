@@ -320,6 +320,7 @@ fn_config_dayz(){
 	if [ ! -f ".dayzserver.cfg" ]; then
 		fn_loadconfig_dayz
 	fi
+	fn_loadconfig_dayz
 	nano .dayzserver.cfg
 }
 
