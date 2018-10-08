@@ -6,7 +6,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=8
+version=9
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
@@ -50,6 +50,20 @@ fn_checkscreen(){
 	fi
 }
 
+fn_loadconfig_dayz(){
+	if [ ! -f ".default.cfg" ]; then
+		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
+	fi
+	if [ ! -f ".dayzserver.cfg" ]; then
+		cp .default.cfg .dayzserver.cfg
+	fi
+	if [ "$(grep dayzparameter .dayzserver.cfg)" == "" ]; then
+                cp .default.cfg .dayzserver.cfg
+        fi
+	source .default.cfg
+	source .dayzserver.cfg
+}
+
 fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
 }
@@ -71,8 +85,10 @@ fn_start_dayz(){
 		exit 1
 	else
 		printf "[${green} DayZ ${default}] Starting server...\n"
-		sleep 1
-		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe -config=serverDZ.cfg -port=2302 -freezecheck
+		0.5
+		fn_loadconfig_dayz
+		sleep 0.5
+		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe $dayzparameter
 		sleep 1
 		date > .dayzlockfile
 	fi
@@ -304,6 +320,7 @@ cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
+cmd_config=( "cfg;config" "fn_config_dayz" "Edit the Script Config." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
 cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Updates this script." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
@@ -313,8 +330,7 @@ cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" )
-currentopt+=( "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
 
 ### Build list of available commands
 optcommands=()
