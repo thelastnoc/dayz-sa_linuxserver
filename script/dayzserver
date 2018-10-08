@@ -5,7 +5,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=7
+version=8
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
