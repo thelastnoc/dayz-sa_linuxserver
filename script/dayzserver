@@ -6,7 +6,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=10
+version=11
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=~/.wine64
@@ -273,11 +273,11 @@ fn_backup_dayz(){
 	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
+		tar -cf ~/backup/${missionfolder}-$(date +%Y-%m-%d).tar ~/serverfiles/mpmissions/${missionfolder}
 	else
 		fn_stop_dayz
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ~/backup/${missionfolder}-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
+		tar -cf ~/backup/${missionfolder}-$(date +%Y-%m-%d).tar ~/serverfiles/mpmissions/${missionfolder}
 		sleep 0.5
 		fn_start_dayz
 	fi
