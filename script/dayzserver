@@ -9,7 +9,7 @@
 version=10
 appid=223350
 export WINEARCH=win64
-export WINEPREFIX=~/.wine64
+export WINEPREFIX=${HOME}/.wine64
 
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -88,7 +88,7 @@ fn_start_dayz(){
 		sleep 0.5
 		fn_loadconfig_dayz
 		sleep 0.5
-		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ~/serverfiles/DayZServer_x64.exe $dayzparameter
+		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ${HOME}/serverfiles/DayZServer_x64.exe $dayzparameter
 		sleep 1
 		date > .dayzlockfile
 	fi
@@ -167,7 +167,7 @@ fn_steamlogin_dayz(){
 }
 
 fn_runupdate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update "${appid}" +quit
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
 }
 
 fn_install_dayz(){
@@ -189,19 +189,19 @@ fn_install_dayz(){
 
 fn_update_dayz(){
 	fn_steamlogin_dayz
-	appmanifestfile=~/serverfiles/steamapps/appmanifest_"${appid}".acf
+	appmanifestfile=${HOME}/serverfiles/steamapps/appmanifest_"${appid}".acf
 	printf "[ ... ] Checking for update: SteamCMD"
 	# gets currentbuild
 	currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	
 	# Removes appinfo.vdf as a fix for not always getting up to date version info from SteamCMD
-	if [ -f "~/Steam/appcache/appinfo.vdf" ]; then
-		rm -f "~/Steam/appcache/appinfo.vdf"
+	if [ -f "${HOME}/Steam/appcache/appinfo.vdf" ]; then
+		rm -f "${HOME}/Steam/appcache/appinfo.vdf"
 		sleep 1
 	fi
 
 	# check for new build
-	availablebuild=$(~/steamcmd/steamcmd.sh +login "${steamlogin}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
+	availablebuild=$(${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
 		printf "\r[ ${red}FAIL${default} ] Checking for update: SteamCMD\n"
 		sleep 0.5
@@ -248,7 +248,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
-	~/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ~/serverfiles +app_update "${appid}" validate +quit
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
 }
 
 fn_validate_dayz(){
@@ -270,21 +270,21 @@ fn_backup_dayz(){
 	if [ ! -d "backup" ]; then
 			mkdir -v backup
 	fi
-	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ~/backup/dayz_missionbackup-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
+		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 	else
 		fn_stop_dayz
 		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ~/backup/${missionfolder}-$(date +%d-%m-%Y).tar ~/serverfiles/mpmissions/${missionfolder}
+		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 		sleep 0.5
 		fn_start_dayz
 	fi
 }
 
 fn_wipe_dayz(){
-	missionfolder=$(grep template ~/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	printf "[${red} WARNING ${default}] Wiping Players and reset Central Economy state from...\n"
 	for seconds in {9..0}; do
 		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
@@ -292,13 +292,13 @@ fn_wipe_dayz(){
 	done
 	printf "\n"
 	if [ "${dayzstatus}" == "0" ]; then
-		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
-		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
+		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
+		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
 		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
 	else
 		fn_stop_dayz
-		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
-		rm -f ~/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
+		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
+		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
 		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
 		sleep 0.5
 		fn_start_dayz
