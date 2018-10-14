@@ -54,14 +54,34 @@ fn_loadconfig_dayz(){
 	if [ ! -f ".default.cfg" ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
 	fi
+	source .default.cfg
 	if [ ! -f ".dayzserver.cfg" ]; then
 		cp .default.cfg .dayzserver.cfg
 	fi
 	if [ "$(grep dayzparameter .dayzserver.cfg)" == "" ]; then
                 cp .default.cfg .dayzserver.cfg
         fi
-	source .default.cfg
 	source .dayzserver.cfg
+	# hostname/servername
+	if [ "(grep -rwi '${HOME}/serverfiles/serverDZ.cfg' -e 'EXAMPLE NAME')" != "" ]; then
+		printf "[ ${cyan}INFO${default} ] Servername is set on defaul! 'EXAMPLE NAME'\n\n"
+		read -p "Enter a new Servername: " servername
+		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
+	fi
+	# battleye config and rconpassword setup
+	if [ ! -f "${HOME}/serverfiles/battleye/BEServer.cfg" ]; then
+		wget -P ${HOME}/serverfiles/battleye/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/BEServer_x64.cfg
+		passwd=$(openssl rand -base64 8 | tr -dc 'A-Za-z0-9')
+		if [ "${passwd}" == "" ]; then
+			passwd=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c10)
+		else
+			printf "[ ${red}FAIL${default} ] Could not generate a passwort for RCON!\n"
+			exit 1
+		fi
+		sed -i "/RConPassword/ s/CHANGEME/${passwd}/" "${HOME}/serverfiles/battleye/BEServer_x64.cfg"
+		printf "[ ${cyan}INFO${default} ] New "
+		grep RConPassword ${HOME}/serverfiles/battleye/BEServer_x64.cfg
+	fi
 }
 
 fn_status_dayz(){
@@ -137,17 +157,27 @@ fn_monitor_dayz(){
 		if [ "${dayzstatus}" == "0" ] && [ -f ".dayzlockfile" ]; then
 			fn_restart_dayz
 		elif [ "${dayzstatus}" != "0" ] && [ -f ."dayzlockfile" ]; then
-			printf "[ ${yellow}INFO${default} ] Server should be online!\n"
+			printf "[ ${cyan}INFO${default} ] Server should be online!\n"
 		else
-			printf "[ ${yellow}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
+			printf "[ ${cyan}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
 		fi
 	else
-		printf "[ ${yellow}INFO${default} ] Serverfiles being updated\n."
+		printf "[ ${cyan}INFO${default} ] Serverfiles being updated\n."
 	fi
 }
 
 fn_console_dayz(){
-	tmux a -t dayzserver
+	printf "[${yellow} Warning ${default}] Press \"CTRL+b\" then \"d\" to exit console.\n    Do NOT press CTRL+c to exit.\n\n"
+	sleep 0.1
+	while true; do
+                read -e -i "Y" -p "Continue? [Y/n] " -r answer
+                case "${answer}" in
+                        [Yy]|[Yy][Ee][Ss]) tmux a -t dayzserver
+                                           return 0;;
+                        [Nn]|[Nn][Oo]) return 1 ;;
+                *) echo "Please answer yes or no." ;;
+                esac
+        done
 }
 
 fn_steamlogin_dayz(){
@@ -156,7 +186,7 @@ fn_steamlogin_dayz(){
 	fi
 	source .steamlogin
 	if [ "${steamlogin}" == "" ]; then
-		printf "[${yellow} INFO ${default}] ${yellow}No Username for Steam is set.\nPlease Enter your Steamlogin that owns Dayz!${default}\n"
+		printf "[ ${cyan}INFO${default} ] ${yellow}No Username for Steam is set.\nPlease Enter your Steamlogin that owns Dayz!${default}\n"
 		sleep 1
 		read -p "Please type in your Steamlogin name: " steamname
 		sleep 0.5
@@ -175,15 +205,14 @@ fn_install_dayz(){
 		mkdir -v steamcmd
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
 	else
-		printf "[${yellow} INFO ${default}] Steamcmd already installed\n"
+		printf "[ ${cyan}INFO${default} ] Steamcmd already installed\n"
 	fi
-
 	if [ ! -f "serverfiles/DayZServer_x64.exe" ]; then
 		mkdir -v serverfiles
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
 	else
-		printf "[${yellow} INFO ${default}] A server is already installed.\n"
+		printf "[ ${cyan}INFO${default} ] A server is already installed.\n"
 	fi
 }
 
@@ -199,7 +228,6 @@ fn_update_dayz(){
 		rm -f "${HOME}/Steam/appcache/appinfo.vdf"
 		sleep 1
 	fi
-
 	# check for new build
 	availablebuild=$(${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +app_info_update 1 +app_info_print "${appid}" +app_info_print "${appid}" +quit | sed -n '/branch/,$p' | grep -m 1 buildid | tr -cd '[:digit:]')
 	if [ -z "${availablebuild}" ]; then
@@ -272,11 +300,11 @@ fn_backup_dayz(){
 	fi
 	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
-		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
+		printf "[ ${green}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
 		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 	else
 		fn_stop_dayz
-		printf "[ ${yellow}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
+		printf "[ ${green}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
 		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 		sleep 0.5
 		fn_start_dayz
@@ -285,7 +313,7 @@ fn_backup_dayz(){
 
 fn_wipe_dayz(){
 	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
-	printf "[${red} WARNING ${default}] Wiping Players and reset Central Economy state from...\n"
+	printf "[ ${red}WARNING${default} ] Wiping Players and reset Central Economy state from...\n"
 	for seconds in {9..0}; do
 		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
 		sleep 1
@@ -321,6 +349,8 @@ fn_config_dayz(){
 	fi
 	fn_loadconfig_dayz
 	nano .dayzserver.cfg
+	printf "[ ${cyan}INFO${default} ] Select a config file you want to open!\n\\n\t[0] - script-default (read only!)\n\t[1] - script\n\t[2] - serverDZ\n\t[3] - battleye\n\t[x] exit\n\n"
+	fn_loadconfig_dayz
 }
 
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
