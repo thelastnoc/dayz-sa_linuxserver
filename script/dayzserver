@@ -51,14 +51,13 @@ fn_checkscreen(){
 }
 
 fn_loadconfig_dayz(){
+	# default config
 	if [ ! -f ".default.cfg" ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
 	fi
 	source .default.cfg
-	if [ ! -f ".dayzserver.cfg" ]; then
-		cp .default.cfg .dayzserver.cfg
-	fi
-	if [ "$(grep dayzparameter .dayzserver.cfg)" == "" ]; then
+	# script config
+	if [ ! -f ".dayzserver.cfg" ] || [ "$(grep dayzparameter .dayzserver.cfg)" == "" ]; then
                 cp .default.cfg .dayzserver.cfg
         fi
 	source .dayzserver.cfg
@@ -74,13 +73,15 @@ fn_loadconfig_dayz(){
 		passwd=$(openssl rand -base64 8 | tr -dc 'A-Za-z0-9')
 		if [ "${passwd}" == "" ]; then
 			passwd=$(< /dev/urandom tr -dc 'A-Za-z0-9' | head -c10)
-		else
-			printf "[ ${red}FAIL${default} ] Could not generate a passwort for RCON!\n"
-			exit 1
 		fi
-		sed -i "/RConPassword/ s/CHANGEME/${passwd}/" "${HOME}/serverfiles/battleye/BEServer_x64.cfg"
-		printf "[ ${cyan}INFO${default} ] New "
-		grep RConPassword ${HOME}/serverfiles/battleye/BEServer_x64.cfg
+		if [ "${passwd}" == "" ]; then
+			printf "[ ${red}FAIL${default} ] Could not generate a passwort for RCON!\nOpen the Battleye config with './dayzserver cfg' and enter '3' to open it."
+			exit 1
+		else
+			sed -i "/RConPassword/ s/CHANGEME/${passwd}/" "${HOME}/serverfiles/battleye/BEServer_x64.cfg"
+			printf "[ ${cyan}INFO${default} ] New "
+			grep RConPassword ${HOME}/serverfiles/battleye/BEServer_x64.cfg
+		fi
 	fi
 }
 
@@ -344,13 +345,16 @@ fn_updatescript_dayz(){
 }
 
 fn_config_dayz(){
-	if [ ! -f ".dayzserver.cfg" ]; then
-		fn_loadconfig_dayz
-	fi
 	fn_loadconfig_dayz
-	nano .dayzserver.cfg
-	printf "[ ${cyan}INFO${default} ] Select a config file you want to open!\n\\n\t[0] - script-default (read only!)\n\t[1] - script\n\t[2] - serverDZ\n\t[3] - battleye\n\t[x] exit\n\n"
-	fn_loadconfig_dayz
+	printf "[ ${cyan}INFO${default} ] Following config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}x${default}] - exit\n\n"
+	read -p "Select the config File: " configfile
+	case "$configfile" in
+		0|default) nano -cv .default.cfg;;
+		1|script) nano -c .dayzserver.cfg;;
+		2|server) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
+		3|battleye) nano -c ${HOME}/serverfiles/battleye/BEServer_x64.cfg;;
+		*) exit 1
+	esac
 }
 
 cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
