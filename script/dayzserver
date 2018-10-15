@@ -62,13 +62,14 @@ fn_loadconfig_dayz(){
         fi
 	source .dayzserver.cfg
 	# hostname/servername
-	if [ "(grep -rwi '${HOME}/serverfiles/serverDZ.cfg' -e 'EXAMPLE NAME')" != "" ]; then
+	defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
+	if [ "${defaultservername}" != "" ]; then
 		printf "[ ${cyan}INFO${default} ] Servername is set on defaul! 'EXAMPLE NAME'\n\n"
 		read -p "Enter a new Servername: " servername
 		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
 	fi
 	# battleye config and rconpassword setup
-	if [ ! -f "${HOME}/serverfiles/battleye/BEServer.cfg" ]; then
+	if [ ! -f "${HOME}/serverfiles/battleye/BEServer_x64.cfg" ]; then
 		wget -P ${HOME}/serverfiles/battleye/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/BEServer_x64.cfg
 		passwd=$(openssl rand -base64 8 | tr -dc 'A-Za-z0-9')
 		if [ "${passwd}" == "" ]; then
@@ -79,8 +80,9 @@ fn_loadconfig_dayz(){
 			exit 1
 		else
 			sed -i "/RConPassword/ s/CHANGEME/${passwd}/" "${HOME}/serverfiles/battleye/BEServer_x64.cfg"
-			printf "[ ${cyan}INFO${default} ] New "
+			printf "[ ${cyan}INFO${default} ] ${yellow}New "
 			grep RConPassword ${HOME}/serverfiles/battleye/BEServer_x64.cfg
+			printf "${default}"
 		fi
 	fi
 }
@@ -223,7 +225,6 @@ fn_update_dayz(){
 	printf "[ ... ] Checking for update: SteamCMD"
 	# gets currentbuild
 	currentbuild=$(grep buildid "${appmanifestfile}" | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
-	
 	# Removes appinfo.vdf as a fix for not always getting up to date version info from SteamCMD
 	if [ -f "${HOME}/Steam/appcache/appinfo.vdf" ]; then
 		rm -f "${HOME}/Steam/appcache/appinfo.vdf"
@@ -346,7 +347,7 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "[ ${cyan}INFO${default} ] Following config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
 		0|default) nano -cv .default.cfg;;
