@@ -190,7 +190,7 @@ fn_steamlogin_dayz(){
 	source .steamlogin
 	if [ "${steamlogin}" == "" ]; then
 		printf "\n[ ${magenta}STEAM${default} ] "
-		read -p "Please type in your Steamlogin: " steamname
+		read -p "Please type in your Steamlogin (username): " steamname
 		sleep 0.5
 		sed -i "/steamlogin/ s/=/=$steamname/" .steamlogin
 		sleep 0.5
@@ -206,7 +206,7 @@ fn_install_dayz(){
 	if [ ! -f "steamcmd/steamcmd.sh" ]; then
 		mkdir steamcmd &> /dev/null
 		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxf - -C steamcmd
-		printf "[ ${lightblue}STEAM${default} ] Steamcmd installed\n"
+		printf "[ ${yellow}STEAM${default} ] Steamcmd installed\n"
 	else
 		printf "[ ${lightblue}STEAM${default} ] Steamcmd already installed\n"
 	fi
@@ -348,13 +348,14 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}4${default}] - steamlogin\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
 		0|default) nano -cv .default.cfg;;
 		1|script) nano -c .dayzserver.cfg;;
 		2|server) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
 		3|battleye) nano -c ${HOME}/serverfiles/battleye/BEServer_x64.cfg;;
+		4|steamlogin) nano -c .steamlogin;;
 		*) exit 1
 	esac
 }
