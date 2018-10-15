@@ -303,11 +303,11 @@ fn_backup_dayz(){
 	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
 		printf "[ ${green}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
+		tar -cf ${HOME}/backup/${missionfolder}-$(date +%Y-%m-%d).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 	else
 		fn_stop_dayz
 		printf "[ ${green}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
-		tar -cf ${HOME}/backup/${missionfolder}-$(date +%d-%m-%Y).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
+		tar -cf ${HOME}/backup/${missionfolder}-$(date +%Y-%m-%d).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
 		sleep 0.5
 		fn_start_dayz
 	fi
