@@ -212,11 +212,11 @@ fn_install_dayz(){
 	fi
 	if [ ! -f "serverfiles/DayZServer_x64.exe" ]; then
 		mkdir serverfiles &> /dev/null
-		printf "[ ${yellow}INFO${default} ] Downloading DayZ Server-Files!\n"
+		printf "[ ${yellow}DayZ${default} ] Downloading DayZ Server-Files!\n"
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
 	else
-		printf "[ ${lightblue}OK${default} ] A server is already installed.\n"
+		printf "[ ${lightblue}DayZ${default} ] A server is already installed.\n"
 	fi
 }
 
@@ -325,12 +325,12 @@ fn_wipe_dayz(){
 	if [ "${dayzstatus}" == "0" ]; then
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+		printf "[ ${yellow}DayZ${default} ] Player.db and Storage-data wiped!\n"
 	else
 		fn_stop_dayz
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+		printf "[ ${yellow}DayZ${default} ] Player.db and Storage-data wiped!\n"
 		sleep 0.5
 		fn_start_dayz
 	fi
@@ -410,7 +410,7 @@ fn_checkscreen
 
 getopt=$1
 if [ ! -f "serverfiles/DayZServer_x64.exe" ] || [ ! -f "steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
-	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!"
+	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x dayzserver
 	fn_install_dayz
 	exit
