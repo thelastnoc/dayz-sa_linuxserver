@@ -107,7 +107,7 @@ fn_start_dayz(){
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
-		printf "[${green} DayZ ${default}] Starting server...\n"
+		printf "[ ${green}DayZ${default} ] Starting server...\n"
 		sleep 0.5
 		fn_loadconfig_dayz
 		sleep 0.5
