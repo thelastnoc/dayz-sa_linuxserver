@@ -53,7 +53,7 @@ fn_checkscreen(){
 fn_loadconfig_dayz(){
 	# default config
 	if [ ! -f "${HOME}/.default.cfg" ]; then
-		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
 	fi
 	source ${HOME}/.default.cfg
 	# script config
@@ -185,7 +185,7 @@ fn_console_dayz(){
 
 fn_steamlogin_dayz(){
 	if [ ! -f "${HOME}/.steamlogin" ]; then
-		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
 	fi
 	source ${HOME}/.steamlogin
 	if [ "${steamlogin}" == "" ]; then
@@ -339,7 +339,7 @@ fn_wipe_dayz(){
 fn_updatescript_dayz(){
 	checkversion=$(curl -s https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/version)
 	if [ ${checkversion} -gt ${version} ]; then
-		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/dayzserver --show-progress
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/dayzserver --show-progress
 		chmod u+x dayzserver
 	else
 		printf "No update\n"
