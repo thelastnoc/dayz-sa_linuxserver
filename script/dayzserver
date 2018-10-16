@@ -69,7 +69,7 @@ fn_loadconfig_dayz(){
 		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
 	fi
 	# battleye config and rconpassword setup
-	if [ ! -f "${HOME}/serverfiles/battleye/BEServer_x64.cfg" ]; then
+	if [ ! 0 -lt $(ls ${HOME}/serverfiles/battleye/BEServer_x64* 2>/dev/null | wc -w) ]; then
 		wget -P ${HOME}/serverfiles/battleye/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/BEServer_x64.cfg
 		passwd=$(openssl rand -base64 8 | tr -dc 'A-Za-z0-9')
 		if [ "${passwd}" == "" ]; then
@@ -354,7 +354,7 @@ fn_config_dayz(){
 		0|default) nano -cv ${HOME}/.default.cfg;;
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
 		2|server) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
-		3|battleye) nano -c ${HOME}/serverfiles/battleye/BEServer_x64.cfg;;
+		3|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
 		4|steamlogin) nano -c ${HOME}/.steamlogin;;
 		*) exit 1
 	esac
