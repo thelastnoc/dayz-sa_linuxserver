@@ -55,12 +55,12 @@ fn_loadconfig_dayz(){
 	if [ ! -f "${HOME}/.default.cfg" ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
 	fi
-	source .default.cfg
+	source ${HOME}/.default.cfg
 	# script config
 	if [ ! -f "${HOME}/.dayzserver.cfg" ] || [ "$(grep dayzparameter ${HOME}/.dayzserver.cfg)" == "" ]; then
                 cp ${HOME}/.default.cfg ${HOME}/.dayzserver.cfg
         fi
-	source .dayzserver.cfg
+	source ${HOME}/.dayzserver.cfg
 	# hostname/servername
 	defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
 	if [ "${defaultservername}" != "" ]; then
@@ -187,7 +187,7 @@ fn_steamlogin_dayz(){
 	if [ ! -f "${HOME}/.steamlogin" ]; then
 		wget -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
 	fi
-	source .steamlogin
+	source ${HOME}/.steamlogin
 	if [ "${steamlogin}" == "" ]; then
 		printf "\n[ ${magenta}STEAM${default} ] "
 		read -p "Please type in your Steamlogin (username): " steamname
