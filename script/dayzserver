@@ -6,7 +6,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=12
+version=13
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=${HOME}/.wine64
@@ -64,7 +64,7 @@ fn_loadconfig_dayz(){
 	# hostname/servername
 	defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
 	if [ "${defaultservername}" != "" ]; then
-		printf "[ ${cyan}INFO${default} ] Servername is set on defaul! 'EXAMPLE NAME'\n\n"
+		printf "[ ${magenta}SERVER${default} ] Servername is set on default! 'EXAMPLE NAME'\n\n"
 		read -p "Enter a new Servername: " servername
 		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
 	fi
@@ -92,7 +92,7 @@ fn_status_dayz(){
 }
 
 fn_fstartfix_dayz(){
-	printf "[${cyan} INFO ${default}] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
+	printf "[ ${cyan}INFO${default} ] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
 	sleep 4
 	rm .dayzlockfile
 	killall -u dayz
@@ -107,7 +107,7 @@ fn_start_dayz(){
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
-		printf "[${green} DayZ ${default}] Starting server...\n"
+		printf "[ ${green}DayZ${default} ] Starting server...\n"
 		sleep 0.5
 		fn_loadconfig_dayz
 		sleep 0.5
@@ -160,12 +160,12 @@ fn_monitor_dayz(){
 		if [ "${dayzstatus}" == "0" ] && [ -f ".dayzlockfile" ]; then
 			fn_restart_dayz
 		elif [ "${dayzstatus}" != "0" ] && [ -f ."dayzlockfile" ]; then
-			printf "[ ${cyan}INFO${default} ] Server should be online!\n"
+			printf "[ ${lightblue}INFO${default} ] Server should be online!\n"
 		else
-			printf "[ ${cyan}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
+			printf "[ ${yellow}INFO${default} ] Don't use monitor to start the server. Use the start command.\n"
 		fi
 	else
-		printf "[ ${cyan}INFO${default} ] Serverfiles being updated\n."
+		printf "[ ${yellow}INFO${default} ] Serverfiles being updated\n."
 	fi
 }
 
@@ -189,9 +189,8 @@ fn_steamlogin_dayz(){
 	fi
 	source .steamlogin
 	if [ "${steamlogin}" == "" ]; then
-		printf "[ ${cyan}INFO${default} ] ${yellow}No Username for Steam is set.\nPlease Enter your Steamlogin that owns Dayz!${default}\n"
-		sleep 1
-		read -p "Please type in your Steamlogin name: " steamname
+		printf "\n[ ${magenta}STEAM${default} ] "
+		read -p "Please type in your Steamlogin (username): " steamname
 		sleep 0.5
 		sed -i "/steamlogin/ s/=/=$steamname/" .steamlogin
 		sleep 0.5
@@ -205,17 +204,19 @@ fn_runupdate_dayz(){
 
 fn_install_dayz(){
 	if [ ! -f "steamcmd/steamcmd.sh" ]; then
-		mkdir -v steamcmd
-		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - -C steamcmd
+		mkdir steamcmd &> /dev/null
+		curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxf - -C steamcmd
+		printf "[ ${yellow}STEAM${default} ] Steamcmd installed\n"
 	else
-		printf "[ ${cyan}INFO${default} ] Steamcmd already installed\n"
+		printf "[ ${lightblue}STEAM${default} ] Steamcmd already installed\n"
 	fi
 	if [ ! -f "serverfiles/DayZServer_x64.exe" ]; then
-		mkdir -v serverfiles
+		mkdir serverfiles &> /dev/null
+		printf "[ ${yellow}DayZ${default} ] Downloading DayZ Server-Files!\n"
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
 	else
-		printf "[ ${cyan}INFO${default} ] A server is already installed.\n"
+		printf "[ ${lightblue}DayZ${default} ] A server is already installed.\n"
 	fi
 }
 
@@ -298,7 +299,7 @@ fn_validate_dayz(){
 fn_backup_dayz(){
 	fn_status_dayz
 	if [ ! -d "backup" ]; then
-			mkdir -v backup
+			mkdir backup &> /dev/null
 	fi
 	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
@@ -324,12 +325,12 @@ fn_wipe_dayz(){
 	if [ "${dayzstatus}" == "0" ]; then
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+		printf "[ ${yellow}DayZ${default} ] Player.db and Storage-data wiped!\n"
 	else
 		fn_stop_dayz
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/players.db
 		rm -f ${HOME}/serverfiles/mpmissions/${missionfolder}/storage_1/data/*
-		printf "[${yellow} DayZ ${default}] Player.db and Storage-data wiped!\n"
+		printf "[ ${yellow}DayZ${default} ] Player.db and Storage-data wiped!\n"
 		sleep 0.5
 		fn_start_dayz
 	fi
@@ -347,13 +348,14 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}4${default}] - steamlogin\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
 		0|default) nano -cv .default.cfg;;
 		1|script) nano -c .dayzserver.cfg;;
 		2|server) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
 		3|battleye) nano -c ${HOME}/serverfiles/battleye/BEServer_x64.cfg;;
+		4|steamlogin) nano -c .steamlogin;;
 		*) exit 1
 	esac
 }
@@ -409,9 +411,9 @@ fn_checkscreen
 
 getopt=$1
 if [ ! -f "serverfiles/DayZServer_x64.exe" ] || [ ! -f "steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
-	printf "[ ${yellow} INFO ${default} ] No installed steamcmd and/or serverfiles found!\n"
-	printf "\nFirst run:\t ${cyan} ./dayzserver install ${default}\n"
+	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x dayzserver
+	fn_install_dayz
 	exit
 else
 	### Check if user commands exist and run corresponding scripts, or display script usage
