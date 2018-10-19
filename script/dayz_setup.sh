@@ -27,7 +27,7 @@ elif [ "${distroid}" == "arch" ]; then
         sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
         sudo locale-gen
         # enable multilib
-        mlibln=$(grep -nr multilib] pacman.conf | cut -d : -f 1)
+        mlibln=$(grep -nr multilib] /etc/pacman.conf | cut -d : -f 1)
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
         mlibln=$(($mlibln + 1))
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
