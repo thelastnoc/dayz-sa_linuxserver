@@ -24,13 +24,15 @@ if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ]; then
         sudo apt install --install-recommends winehq-stable xvfb winbind tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc wget -y
 # archlinux
 elif [ "${distroid}" == "arch" ]; then
+        sudo sed -i 's/^#en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/g' /etc/locale.gen
+        sudo locale-gen
         # enable multilib
         mlibln=$(grep -nr multilib] pacman.conf | cut -d : -f 1)
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
         mlibln=$(($mlibln + 1))
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
         sudo pacman -Syu
-        sudo pacman -S wine xorg-server-xvfb tmux nano htop curl psmisc wget lib32-gcc-libs lib32-libstdc++5
+        sudo pacman -S wine xorg-server-xvfb tmux nano htop curl psmisc wget lib32-gcc-libs
 else
         printf "[ INFO ] Your Linux Distribution is not tested yet.\n"
 fi
