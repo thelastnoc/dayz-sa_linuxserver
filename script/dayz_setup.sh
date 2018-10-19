@@ -32,7 +32,7 @@ elif [ "${distroid}" == "arch" ]; then
         mlibln=$(($mlibln + 1))
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
         sudo pacman -Syu
-        sudo pacman -S wine xorg-server-xvfb tmux nano htop curl psmisc wget lib32-gcc-libs
+        sudo pacman -S wine xorg-server-xvfb tmux nano htop curl psmisc wget lib32-gcc-libs extra/libglvnd multilib/lib32-libglvnd
 else
         printf "[ INFO ] Your Linux Distribution is not tested yet.\n"
 fi
