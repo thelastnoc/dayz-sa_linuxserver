@@ -4,7 +4,6 @@ if [ "$(sudo -v)" != "" ]; then
         printf "[ FAIL ] You have to run this script as root!\n"
         exit 1
 fi
-
 # get the distribution of the os
 distroid=$(grep ID /etc/os-release | grep -v _ID | grep -v ID_ | sed 's/ID=//g' | sed 's/\"//g')
 # debian and ubuntu
@@ -36,8 +35,6 @@ elif [ "${distroid}" == "arch" ]; then
 else
         printf "[ INFO ] Your Linux Distribution is not tested yet.\n"
 fi
-
-
 # add a new user for the gameserver
 sudo useradd -m -s /bin/bash dayz
 sleep 0.5
