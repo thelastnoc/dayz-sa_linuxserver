@@ -6,7 +6,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=14
+version=15
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=${HOME}/.wine64
@@ -95,7 +95,7 @@ fn_fstartfix_dayz(){
 	printf "[ ${cyan}INFO${default} ] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
 	sleep 4
 	rm .dayzlockfile
-	killall -u dayz
+	killall -u $(whoami)
 }
 
 fn_start_dayz(){
@@ -103,7 +103,7 @@ fn_start_dayz(){
 		firststart=1
 	fi
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ] && [ -f "${HOME}/.dayzlockfile" ]; then
+	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
@@ -122,7 +122,7 @@ fn_start_dayz(){
 
 fn_stop_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ] && [ -f "${HOME}/.dayzlockfile" ]; then
+	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 15 seconds giving the server time to shutdown gracefuly
 		for seconds in {1..15}; do
@@ -141,7 +141,7 @@ fn_stop_dayz(){
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
-			killall -u dayz
+			killall -u $(whoami)
 		fi
 	else
 		printf "[ ${yellow}DayZ${default} ] Server not running.\n"
@@ -216,7 +216,8 @@ fn_install_dayz(){
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
 	else
-		printf "[ ${lightblue}DayZ${default} ] A server is already installed.\n"
+		printf "[ ${lightblue}DayZ${default} ] The Server is already installed.\n"
+		${HOME}/dayzserver
 	fi
 }
 
@@ -410,10 +411,13 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
-if [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ] || [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] && [ "${getopt}" != "install" ]; then
+if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ] && [ "${getopt}" != "cfg" ] || [ "${getopt}" != "config" ]; then
 	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x ${HOME}/dayzserver
 	fn_install_dayz
+	if [ -f "${HOME}/steamcmd/steamcmd.sh" ] && [ -f "${HOME}/serverfiles/DayZServer_x64.exe" ]; then
+		${HOME}/dayzserver
+	fi
 	exit
 else
 	### Check if user commands exist and run corresponding scripts, or display script usage
