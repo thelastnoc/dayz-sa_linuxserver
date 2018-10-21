@@ -95,7 +95,7 @@ fn_fstartfix_dayz(){
 	printf "[ ${cyan}INFO${default} ] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
 	sleep 4
 	rm .dayzlockfile
-	killall -u dayz
+	killall -u $(whoami)
 }
 
 fn_start_dayz(){
@@ -103,7 +103,7 @@ fn_start_dayz(){
 		firststart=1
 	fi
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ] && [ -f "${HOME}/.dayzlockfile" ]; then
+	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
@@ -122,7 +122,7 @@ fn_start_dayz(){
 
 fn_stop_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ] && [ -f "${HOME}/.dayzlockfile" ]; then
+	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 15 seconds giving the server time to shutdown gracefuly
 		for seconds in {1..15}; do
@@ -141,7 +141,7 @@ fn_stop_dayz(){
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
-			killall -u dayz
+			killall -u $(whoami)
 		fi
 	else
 		printf "[ ${yellow}DayZ${default} ] Server not running.\n"
