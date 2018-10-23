@@ -6,7 +6,7 @@
 ### This script uses Wine, Xvfb, Tmux
 #############################################
 
-version=15
+version=16
 appid=223350
 export WINEARCH=win64
 export WINEPREFIX=${HOME}/.wine64
@@ -411,7 +411,7 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
-if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ] && [ "${getopt}" != "cfg" ] || [ "${getopt}" != "config" ]; then
+if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ] && [ "${getopt}" != "cfg" ]; then
 	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x ${HOME}/dayzserver
 	fn_install_dayz
