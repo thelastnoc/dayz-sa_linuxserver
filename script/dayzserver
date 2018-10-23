@@ -217,7 +217,7 @@ fn_install_dayz(){
 		fn_runvalidate_dayz
 	else
 		printf "[ ${lightblue}DayZ${default} ] The Server is already installed.\n"
-		${HOME}/dayzserver
+		fn_opt_usage
 	fi
 }
 
