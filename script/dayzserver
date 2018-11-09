@@ -416,7 +416,7 @@ if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZSe
 	chmod u+x ${HOME}/dayzserver
 	fn_install_dayz
 	if [ -f "${HOME}/steamcmd/steamcmd.sh" ] && [ -f "${HOME}/serverfiles/DayZServer_x64.exe" ]; then
-		${HOME}/dayzserver
+		fn_opt_usage
 	fi
 	exit
 else
