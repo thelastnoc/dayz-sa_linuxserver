@@ -349,14 +349,14 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "\nFollowing config Files available!\n\\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}4${default}] - steamlogin\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}4${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
-		0|default) nano -cv ${HOME}/.default.cfg;;
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
-		2|server) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
+		2|server|serverDZ) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
 		3|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
 		4|steamlogin) nano -c ${HOME}/.steamlogin;;
+		0|default) nano -cv ${HOME}/.default.cfg;;
 		*) exit 1
 	esac
 }
