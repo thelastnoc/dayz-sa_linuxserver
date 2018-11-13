@@ -64,9 +64,8 @@ fn_loadconfig_dayz(){
 	# hostname/servername
 	if [ ! -f "${HOME}/serverfiles/serverDZ.cfg" ]; then
 		wget -P ${HOME}/serverfiles/ -q https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/serverDZ.cfg
-	else
-		defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
 	fi
+	defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
 	if [ "${defaultservername}" != "" ]; then
 		printf "[ ${magenta}SERVER${default} ] Servername is set on default! 'EXAMPLE NAME'\n\n"
 		read -p "Enter a new Servername: " servername
