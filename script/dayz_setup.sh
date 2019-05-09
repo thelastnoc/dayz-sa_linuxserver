@@ -8,12 +8,13 @@ fi
 distroid=$(grep ID /etc/os-release | grep -v _ID | grep -v ID_ | sed 's/ID=//g' | sed 's/\"//g')
 # debian and ubuntu
 if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ]; then
-        wget -nc https://dl.winehq.org/wine-builds/Release.key
+        wget -nc https://dl.winehq.org/wine-builds/winehq.key
         sleep 0.5
-        sudo apt-key add Release.key
+        sudo apt-key add winehq.key
         printf "deb https://dl.winehq.org/wine-builds/${distroid}/ $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/winehq.source.list > /dev/null
         # ubuntu 18 server needs universe repo
         if [ "${distroid}" == "ubuntu" ]; then
+                sudo apt install software-properties-common -y
                 sudo add-apt-repository universe
         fi
         # install required packages
