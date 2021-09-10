@@ -1,4 +1,4 @@
-# dayzsa_linuxserver
+# dayzsa_linuxserver with wine
 
 This Script is a modified fork of the <a href="https://linuxgsm.com">Linux Game Server Manager</a> to run a DayZ Standalone Exprimental 0.63 Community Server!
 
