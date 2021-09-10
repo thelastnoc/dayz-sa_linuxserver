@@ -4,4 +4,4 @@ This Script is a modified fork of the <a href="https://linuxgsm.com">Linux Game 
 It make use of tmux to seperate it from the user shell. It runs completely on the console so you can run it on a Root or V-Server with limited SSH access. 
 
 
-# Currently WORKING with DayZ Standalone v1.14 Experimental!
+# Currently working with DayZ Standalone v1.14 Experimental!
