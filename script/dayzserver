@@ -92,13 +92,6 @@ fn_status_dayz(){
 	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
 }
 
-fn_fstartfix_dayz(){
-	printf "[ ${cyan}INFO${default} ] The first start of the server may freeze! Have to kill processes!\n         Please start the server again with ${green}./dayzserver start${default}\n"
-	sleep 4
-	rm .dayzlockfile
-	killall -u $(whoami)
-}
-
 fn_start_dayz(){
 	fn_status_dayz
 	if [ "${dayzstatus}" == "1" ]; then
@@ -114,9 +107,6 @@ fn_start_dayz(){
 		sleep 1
 		cd ${HOME}
 		date > ${HOME}/.dayzlockfile
-	fi
-	if [ "${firststart}" == "1" ]; then
-		fn_fstartfix_dayz
 	fi
 }
 
