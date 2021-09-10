@@ -17,7 +17,7 @@ if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" || [ "${distroid
         sudo dpkg --add-architecture i386
         sudo apt install apt-transport-https -y
         sudo apt update
-        sudo apt install xvfb tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc wget -y
+        sudo apt install tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc wget -y
 
 # archlinux
 elif [ "${distroid}" == "arch" ]; then
@@ -29,7 +29,7 @@ elif [ "${distroid}" == "arch" ]; then
         mlibln=$(($mlibln + 1))
         sudo sed -i "${mlibln}s/^#//g" /etc/pacman.conf
         sudo pacman -Syu
-        sudo pacman -S xorg-server-xvfb tmux nano htop curl psmisc wget lib32-gcc-libs extra/libglvnd multilib/lib32-libglvnd
+        sudo pacman -S tmux nano htop curl psmisc wget lib32-gcc-libs extra/libglvnd multilib/lib32-libglvnd
 else
         printf "[ INFO ] Your Linux Distribution is not tested yet.\n"
 fi
