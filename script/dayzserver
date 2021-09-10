@@ -6,7 +6,7 @@
 ### This script uses Tmux
 #############################################
 
-version=17
+version=18
 appid=1042420
 
 if [ "${ansi}" != "off" ]; then
@@ -411,11 +411,11 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
-if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ] && [ "${getopt}" != "cfg" ]; then
+if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer" ] && [ "${getopt}" != "cfg" ]; then
 	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x ${HOME}/dayzserver
 	fn_install_dayz
-	if [ -f "${HOME}/steamcmd/steamcmd.sh" ] && [ -f "${HOME}/serverfiles/DayZServer_x64.exe" ]; then
+	if [ -f "${HOME}/steamcmd/steamcmd.sh" ] && [ -f "${HOME}/serverfiles/DayZServer" ]; then
 		fn_opt_usage
 	fi
 	exit
