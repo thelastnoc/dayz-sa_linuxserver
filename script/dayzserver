@@ -3,13 +3,11 @@
 ### THIS IS WORK IN PROGRESS!
 ### DayZ Standalone linuxserver script
 ### maintained by thelastnoc
-### This script uses Wine, Xvfb, Tmux
+### This script uses Tmux
 #############################################
 
-version=16
-appid=223350
-export WINEARCH=win64
-export WINEPREFIX=${HOME}/.wine64
+version=17
+appid=1042420
 
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -102,9 +100,6 @@ fn_fstartfix_dayz(){
 }
 
 fn_start_dayz(){
-	if [ ! -d "${HOME}/.wine64" ]; then
-		firststart=1
-	fi
 	fn_status_dayz
 	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
@@ -114,8 +109,10 @@ fn_start_dayz(){
 		sleep 0.5
 		fn_loadconfig_dayz
 		sleep 0.5
-		tmux new-session -d -x 23 -y 80 -s dayzserver xvfb-run --auto-servernum --server-args='-screen 0 640x480x24:32' wine ${HOME}/serverfiles/DayZServer_x64.exe $dayzparameter
+		cd ${HOME}/serverfiles
+		tmux new-session -d -x 23 -y 80 -s dayzserver ./DayZServer $dayzparameter
 		sleep 1
+		cd ${HOME}
 		date > ${HOME}/.dayzlockfile
 	fi
 	if [ "${firststart}" == "1" ]; then
@@ -128,7 +125,7 @@ fn_stop_dayz(){
 	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 15 seconds giving the server time to shutdown gracefuly
-		for seconds in {1..15}; do
+		for seconds in {1..25}; do
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
 				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
@@ -202,7 +199,7 @@ fn_steamlogin_dayz(){
 }
 
 fn_runupdate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
 }
 
 fn_install_dayz(){
@@ -283,7 +280,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +@sSteamCmdForcePlatformType windows +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
 }
 
 fn_validate_dayz(){
@@ -392,7 +389,7 @@ done
 
 # Shows LinuxGSM usage
 fn_opt_usage(){
-        printf "\nDayZ 1.0 - Linux Game Server - Version: "${version}""
+        printf "\nDayZ 1.14 Exp - Linux Game Server - Version: "${version}""
 	printf "\nUsage:${lightblue} $0 [option]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
