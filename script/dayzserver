@@ -88,7 +88,7 @@ fn_loadconfig_dayz(){
 }
 
 fn_status_dayz(){
-	dayzstatus=$(tmux list-sessions -F dayzserver 2> /dev/null | grep -Ecx dayzserver)
+	dayzstatus=$(tmux list-sessions -F $(whoami)-tmux 2> /dev/null | grep -Ecx $(whoami)-tmux)
 }
 
 fn_start_dayz(){
@@ -102,7 +102,7 @@ fn_start_dayz(){
 		fn_loadconfig_dayz
 		sleep 0.5
 		cd ${HOME}/serverfiles
-		tmux new-session -d -x 23 -y 80 -s dayzserver ./DayZServer $dayzparameter
+		tmux new-session -d -x 23 -y 80 -s $(whoami)-tmux ./DayZServer $dayzparameter
 		sleep 1
 		cd ${HOME}
 		date > ${HOME}/.dayzlockfile
@@ -122,12 +122,12 @@ fn_stop_dayz(){
 				break
 			fi
 			printf "\r[ ${magenta}...${default} ] Stopping Server graceful: ${seconds} seconds"
-			tmux send-keys C-c -t dayzserver > /dev/null 2>&1
+			tmux send-keys C-c -t $(whoami)-tmux > /dev/null 2>&1
 			sleep 1
 		done
 		fn_status_dayz
 		if [ "${dayzstatus}" != "0" ]; then
-			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Sending Killall.\n"
+			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Stop Signal.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
 			killall -u $(whoami)
@@ -164,7 +164,7 @@ fn_console_dayz(){
 	while true; do
                 read -e -i "Y" -p "Continue? [Y/n] " -r answer
                 case "${answer}" in
-                        [Yy]|[Yy][Ee][Ss]) tmux a -t dayzserver
+                        [Yy]|[Yy][Ee][Ss]) tmux a -t $(whoami)-tmux
                                            return 0;;
                         [Nn]|[Nn][Oo]) return 1 ;;
                 *) echo "Please answer yes or no." ;;
