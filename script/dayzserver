@@ -3,7 +3,6 @@
 ### THIS IS WORK IN PROGRESS!
 ### DayZ Standalone linuxserver script
 ### maintained by thelastnoc
-### This script uses Tmux
 #############################################
 
 version=18
@@ -115,7 +114,7 @@ fn_stop_dayz(){
 	if [ "${dayzstatus}" == "1" ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 15 seconds giving the server time to shutdown gracefuly
-		for seconds in {1..25}; do
+		for seconds in {1..30}; do
 			fn_status_dayz
 			if [ "${dayzstatus}" == "0" ]; then
 				printf "\r[ ${green}OK${default} ] Stopping Server graceful.\n"
@@ -380,7 +379,7 @@ done
 # Shows LinuxGSM usage
 fn_opt_usage(){
         printf "\nDayZ 1.14 Exp - Linux Game Server - Version: "${version}""
-	printf "\nUsage:${lightblue} $0 [option]${default}\n\n"
+	printf "\nUsage:${lightblue} ./$0 [option]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
         index="0"
