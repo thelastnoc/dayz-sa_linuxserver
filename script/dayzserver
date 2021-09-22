@@ -7,6 +7,8 @@
 
 version=18
 appid=1042420
+stable=221100
+exp_branch=1042420
 
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -272,10 +274,10 @@ fn_workshop_mods(){
 	fn_steamlogin_dayz
 	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100/"
 	declare -a workshopID-list
-	if [ ! -f "${HOME}/.mods.cfg" ]; then
-		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.mods.cfg
+	if [ ! -f "${HOME}/.workshop.cfg" ]; then
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.workshop.cfg
 	fi
-	mapfile -t -s 5 workshopid-list < "${HOME}/.mods.cfg"
+	mapfile -t -s 5 workshopID-list < "${HOME}/.workshop.cfg"
 	for i in "${workshopID-list[@]}"
 	do
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
@@ -359,7 +361,7 @@ fn_config_dayz(){
 	case "$configfile" in
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
 		2|server|serverDZ) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
-		3|workshop) nano -c ${HOME}/.mods.cfg;;
+		3|workshop) nano -c ${HOME}/.workshop.cfg;;
 		4|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
 		5|steamlogin) nano -c ${HOME}/.steamlogin;;
 		0|default) nano -cv ${HOME}/.default.cfg;;
@@ -374,7 +376,7 @@ cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if 
 cmd_config=( "cfg;config" "fn_config_dayz" "Edit any Config File." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
-cmd_workshop=( "ws;workshop" "fn_update_mods" "Download Mods from Steam Workshop." )
+cmd_workshop=( "ws;workshop" "fn_workshop_mods" "Download Mods from Steam Workshop." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
 cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (mpmission)." )
