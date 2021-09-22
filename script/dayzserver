@@ -272,7 +272,7 @@ fn_update_dayz(){
 
 fn_workshop_mods(){
 	fn_steamlogin_dayz
-	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100/"
+	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100"
 	declare -a workshopID-list
 	if [ ! -f "${HOME}/.workshop.cfg" ]; then
 		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.workshop.cfg
@@ -282,6 +282,10 @@ fn_workshop_mods(){
 	do
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
 			${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +workshop_download_item "${stable}" "$i" +quit
+			modname=$(cut -d '"' -f 2 <<< $(grep name  ${workshopfolder}/$i/meta.cpp))
+			if [ ! -d "${HOME}/serverfiles/${modname}" ]; then
+				ln -s ${workshopfolder}/"$i" ${HOME}/serverfiles/@${modname} &> /dev/null
+			fi
 		fi
 	done
 }
