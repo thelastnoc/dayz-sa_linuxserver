@@ -268,6 +268,22 @@ fn_update_dayz(){
 	fi
 }
 
+fn_workshop_mods(){
+	fn_steamlogin_dayz
+	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100/"
+	declare -a workshopID-list
+	if [ ! -f "${HOME}/.mods.cfg" ]; then
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.mods.cfg
+	fi
+	mapfile -t -s 5 workshopid-list < "${HOME}/.mods.cfg"
+	for i in "${workshopID-list[@]}"
+	do
+		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
+			${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +workshop_download_item "${stable}" "$i" +quit
+		fi
+	done
+}
+
 fn_runvalidate_dayz(){
 	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
 }
@@ -338,13 +354,14 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - battleye\n\t[${yellow}4${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - workshop\n\t[${yellow}4${default}] - battleye\n\t[${yellow}5${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
 		2|server|serverDZ) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
-		3|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
-		4|steamlogin) nano -c ${HOME}/.steamlogin;;
+		3|workshop) nano -c ${HOME}/.mods.cfg;;
+		4|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
+		5|steamlogin) nano -c ${HOME}/.steamlogin;;
 		0|default) nano -cv ${HOME}/.default.cfg;;
 		*) exit 1
 	esac
@@ -354,17 +371,18 @@ cmd_start=( "st;start" "fn_start_dayz" "Start the server." )
 cmd_stop=( "sp;stop" "fn_stop_dayz" "Stop the server." )
 cmd_restart=( "r;restart" "fn_restart_dayz" "Restart the server.")
 cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if crashed." )
-cmd_config=( "cfg;config" "fn_config_dayz" "Edit the Script Config." )
+cmd_config=( "cfg;config" "fn_config_dayz" "Edit any Config File." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
-cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Update the script." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
+cmd_workshop=( "ws;workshop" "fn_update_mods" "Download Mods from Steam Workshop." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
 cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (mpmission)." )
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
+cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Update the script." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_updatescript[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_install[@]}" "${cmd_workshop[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" "${cmd_updatescript[@]}" )
 
 ### Build list of available commands
 optcommands=()
@@ -379,7 +397,7 @@ done
 # Shows LinuxGSM usage
 fn_opt_usage(){
         printf "\nDayZ 1.14 Exp - Linux Game Server - Version: "${version}""
-	printf "\nUsage:${lightblue} ./$0 [option]${default}\n\n"
+	printf "\nUsage:${lightblue} $0 [command]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
         index="0"
