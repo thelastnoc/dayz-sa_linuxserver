@@ -283,8 +283,8 @@ fn_workshop_mods(){
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
 			${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +workshop_download_item "${stable}" "$i" +quit
 			modname=$(cut -d '"' -f 2 <<< $(grep name  ${workshopfolder}/$i/meta.cpp))
-			if [ ! -d "${HOME}/serverfiles/${modname}" ]; then
-				ln -s ${workshopfolder}/"$i" ${HOME}/serverfiles/@${modname} &> /dev/null
+			if [ ! -d "${HOME}/serverfiles/@${modname}" ]; then
+				ln -s ${workshopfolder}/$i ${HOME}/serverfiles/@${modname} &> /dev/null
 			fi
 		fi
 	done
