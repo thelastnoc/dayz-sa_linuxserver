@@ -282,7 +282,7 @@ fn_workshop_mods(){
 	# gather mods
 	for i in "${workshopID[@]}"
 	do
-		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
+		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ]; then
 			workshoplist+=" +workshop_download_item "${stable}" "$i""
 		fi
 	done
@@ -291,7 +291,7 @@ fn_workshop_mods(){
 	# link mods
 	for i in "${workshopID[@]}"
 	do
-		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) > 7 ]; then
+		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ]; then
 			modname=$(cut -d '"' -f 2 <<< $(grep name  ${workshopfolder}/$i/meta.cpp))
 			if [ ! -d "${HOME}/serverfiles/@${modname}" ]; then
 				ln -s ${workshopfolder}/$i ${HOME}/serverfiles/@${modname} &> /dev/null
