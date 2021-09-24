@@ -2,10 +2,11 @@
 #############################################
 ### THIS IS WORK IN PROGRESS!
 ### DayZ Standalone linuxserver script
-### maintained by thelastnoc
+### maintained by thelastnoc, fork of linuxgsm
+### contribute as you like
 #############################################
 
-version=18
+version=19
 appid=1042420
 stable=221100
 exp_branch=1042420
@@ -189,10 +190,6 @@ fn_steamlogin_dayz(){
 	fi
 }
 
-fn_runupdate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
-}
-
 fn_install_dayz(){
 	if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ]; then
 		mkdir ${HOME}/steamcmd &> /dev/null
@@ -201,8 +198,9 @@ fn_install_dayz(){
 	else
 		printf "[ ${lightblue}STEAM${default} ] Steamcmd already installed\n"
 	fi
-	if [ ! -f "${HOME}/serverfiles/DayZServer_x64.exe" ]; then
+	if [ ! -f "${HOME}/serverfiles/DayZServer" ]; then
 		mkdir ${HOME}/serverfiles &> /dev/null
+		mkdir ${HOME}/serverprofile &> /dev/null
 		printf "[ ${yellow}DayZ${default} ] Downloading DayZ Server-Files!\n"
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
@@ -210,6 +208,10 @@ fn_install_dayz(){
 		printf "[ ${lightblue}DayZ${default} ] The Server is already installed.\n"
 		fn_opt_usage
 	fi
+}
+
+fn_runupdate_dayz(){
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
 }
 
 fn_update_dayz(){
@@ -254,10 +256,12 @@ fn_update_dayz(){
 		fn_status_dayz
 		if [ "${dayzstatus}" == "0" ]; then
 			fn_runupdate_dayz
+			fn_workshop_mods
 			rm -f ${HOME}/.dayzlockupdate
 		else
 			fn_stop_dayz
 			fn_runupdate_dayz
+			fn_workshop_mods
 			fn_start_dayz
 			rm -f ${HOME}/.dayzlockupdate
 		fi
@@ -267,6 +271,25 @@ fn_update_dayz(){
 		printf "\tCurrent version: ${green}${currentbuild}${default}\n"
 		printf "\tAvailable version: ${green}${availablebuild}${default}\n"
 		printf "\thttps://steamdb.info/app/${appid}/\n\n"
+	fi
+}
+
+fn_runvalidate_dayz(){
+	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
+}
+
+fn_validate_dayz(){
+	fn_status_dayz
+	fn_steamlogin_dayz
+	if [ "${dayzstatus}" == "0" ]; then
+		fn_runvalidate_dayz
+	else
+		date > ${HOME}/.dayzlockupdate
+		fn_stop_dayz
+		fn_runvalidate_dayz
+		fn_workshop_mods
+		rm -f ${HOME}/.dayzlockupdate
+		fn_start_dayz
 	fi
 }
 
@@ -298,24 +321,6 @@ fn_workshop_mods(){
 			fi
 		fi
 	done
-}
-
-fn_runvalidate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
-}
-
-fn_validate_dayz(){
-	fn_status_dayz
-	fn_steamlogin_dayz
-	if [ "${dayzstatus}" == "0" ]; then
-		fn_runvalidate_dayz
-	else
-		date > ${HOME}/.dayzlockupdate
-		fn_stop_dayz
-		fn_runvalidate_dayz
-		rm -f ${HOME}/.dayzlockupdate
-		fn_start_dayz
-	fi
 }
 
 fn_backup_dayz(){
@@ -390,15 +395,15 @@ cmd_monitor=( "m;monitor" "fn_monitor_dayz" "Check server status and restart if 
 cmd_config=( "cfg;config" "fn_config_dayz" "Edit any Config File." )
 cmd_console=( "c;console" "fn_console_dayz" "Access server console." )
 cmd_install=( "i;install" "fn_install_dayz" "Install steamcmd and DayZ Server-Files." )
-cmd_workshop=( "ws;workshop" "fn_workshop_mods" "Download Mods from Steam Workshop." )
 cmd_update=( "u;update" "fn_update_dayz" "Check and apply any server updates." )
 cmd_validate=( "v;validate" "fn_validate_dayz" "Validate server files with SteamCMD." )
+cmd_workshop=( "ws;workshop" "fn_workshop_mods" "Download Mods from Steam Workshop." )
 cmd_backup=( "b;backup" "fn_backup_dayz" "Create backup archives of the server (mpmission)." )
 cmd_wipe=( "wi;wipe" "fn_wipe_dayz" "Wipe your server data (Player and Storage)." )
 cmd_updatescript=( "us;update-script" "fn_updatescript_dayz" "Update the script." )
 
 ### Set specific opt here ###
-currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_install[@]}" "${cmd_workshop[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" "${cmd_updatescript[@]}" )
+currentopt=( "${cmd_start[@]}" "${cmd_stop[@]}" "${cmd_restart[@]}" "${cmd_monitor[@]}" "${cmd_config[@]}" "${cmd_console[@]}" "${cmd_install[@]}" "${cmd_update[@]}" "${cmd_validate[@]}" "${cmd_workshop[@]}" "${cmd_backup[@]}" "${cmd_wipe[@]}" "${cmd_updatescript[@]}" )
 
 ### Build list of available commands
 optcommands=()
@@ -413,6 +418,7 @@ done
 # Shows LinuxGSM usage
 fn_opt_usage(){
         printf "\nDayZ 1.14 Exp - Linux Game Server - Version: "${version}""
+	printf "\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=1517338673"
 	printf "\nUsage:${lightblue} $0 [command]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
         # Display available commands
