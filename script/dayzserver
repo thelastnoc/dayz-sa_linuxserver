@@ -314,11 +314,12 @@ fn_workshop_mods(){
 	# link mods
 	for i in "${workshopID[@]}"
 	do
-		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ]; then
+		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ] && [ -d "${workshopfolder}/$i" ]; then
 			modname=$(cut -d '"' -f 2 <<< $(grep name  ${workshopfolder}/$i/meta.cpp))
 			if [ ! -d "${HOME}/serverfiles/@${modname}" ]; then
 				ln -s ${workshopfolder}/$i ${HOME}/serverfiles/@${modname} &> /dev/null
 			fi
+			find "${workshopfolder}/$i" -depth -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
 		fi
 	done
 }
