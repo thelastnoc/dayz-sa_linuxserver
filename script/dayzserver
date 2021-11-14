@@ -6,7 +6,7 @@
 ### contribute as you like
 #############################################
 
-version=19
+version=20
 appid=1042420
 stable=221100
 exp_branch=1042420
@@ -87,6 +87,10 @@ fn_loadconfig_dayz(){
 			grep RConPassword ${HOME}/serverfiles/battleye/BEServer_x64.cfg
 			printf "${default}"
 		fi
+	fi
+	# workshop
+	if [ ! -f "${HOME}/.workshop.cfg" ]; then
+		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.workshop.cfg
 	fi
 }
 
@@ -317,7 +321,7 @@ fn_workshop_mods(){
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ] && [ -d "${workshopfolder}/$i" ]; then
 			modname=$(cut -d '"' -f 2 <<< $(grep name  ${workshopfolder}/$i/meta.cpp))
 			if [ ! -d "${HOME}/serverfiles/@${modname}" ]; then
-				ln -s ${workshopfolder}/$i ${HOME}/serverfiles/@${modname} &> /dev/null
+				ln -s ${workshopfolder}/$i "${HOME}/serverfiles/@${modname}" &> /dev/null
 			fi
 			find "${workshopfolder}/$i" -depth -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
 		fi
