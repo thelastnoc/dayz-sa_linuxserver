@@ -6,7 +6,7 @@
 ### contribute as you like
 #############################################
 
-version=20
+version=21
 appid=1042420
 stable=221100
 exp_branch=1042420
@@ -109,7 +109,7 @@ fn_start_dayz(){
 		fn_loadconfig_dayz
 		sleep 0.5
 		cd ${HOME}/serverfiles
-		tmux new-session -d -x 23 -y 80 -s $(whoami)-tmux ./DayZServer $dayzparameter
+		tmux new-session -d -x 23 -y 80 -s $(whoami)-tmux ./DayZServer $dayzparameter "$workshop"
 		sleep 1
 		cd ${HOME}
 		date > ${HOME}/.dayzlockfile
