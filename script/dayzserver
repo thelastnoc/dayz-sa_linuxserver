@@ -380,7 +380,7 @@ fn_updatescript_dayz(){
 
 fn_config_dayz(){
 	fn_loadconfig_dayz
-	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\n\t[${yellow}2${default}] - serverDZ\n\t[${yellow}3${default}] - workshop\n\t[${yellow}4${default}] - battleye\n\t[${yellow}5${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
+	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\t(.dayzserver.cfg)\n\t[${yellow}2${default}] - serverDZ\t(serverDZ.cfg)\n\t[${yellow}3${default}] - workshop\t(.workshop.cfg)\n\t[${yellow}4${default}] - battleye\t(BEServer_x64.cfg)\n\t[${yellow}5${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
