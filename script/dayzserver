@@ -385,7 +385,7 @@ fn_config_dayz(){
 	case "$configfile" in
 		1|script) nano -c ${HOME}/.dayzserver.cfg;;
 		2|server|serverDZ) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
-		3|workshop) nano -c ${HOME}/.workshop.cfg;;
+		3|workshop) nano -c ${HOME}/.workshop.cfg && ./dayzserver ws;;
 		4|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/BEServer_x64*);;
 		5|steamlogin) nano -c ${HOME}/.steamlogin;;
 		0|default) nano -cv ${HOME}/.default.cfg;;
