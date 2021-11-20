@@ -311,7 +311,7 @@ fn_workshop_mods(){
 	for i in "${workshopID[@]}"
 	do
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ]; then
-			workshoplist+=" +workshop_download_item "${game}" "$i""
+			workshoplist+=" +workshop_download_item "${dayz_id}" "$i""
 		fi
 	done
 	# download mods
