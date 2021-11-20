@@ -8,8 +8,9 @@
 
 version=22
 appid=1042420
-stable=221100
-exp_branch=1042420
+game=221100
+#stable=223350
+#exp_branch=1042420
 
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -310,7 +311,7 @@ fn_workshop_mods(){
 	for i in "${workshopID[@]}"
 	do
 		if [[ $i =~ ^[0-9] ]] && [ $(expr length $i) -gt 7 ]; then
-			workshoplist+=" +workshop_download_item "${stable}" "$i""
+			workshoplist+=" +workshop_download_item "${game}" "$i""
 		fi
 	done
 	# download mods
