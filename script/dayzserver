@@ -6,7 +6,7 @@
 ### contribute as you like
 #############################################
 
-version=22
+version=23
 appid=1042420
 dayz_id=221100
 #stable=223350
@@ -216,7 +216,7 @@ fn_install_dayz(){
 }
 
 fn_runupdate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" +quit
+	${HOME}/steamcmd/steamcmd.sh +force_install_dir ${HOME}/serverfiles +login "${steamlogin}"  +app_update "${appid}" +quit
 }
 
 fn_update_dayz(){
@@ -280,7 +280,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles +app_update "${appid}" validate +quit
+	${HOME}/steamcmd/steamcmd.sh +force_install_dir ${HOME}/serverfiles +login "${steamlogin}" +app_update "${appid}" validate +quit
 }
 
 fn_validate_dayz(){
@@ -315,7 +315,7 @@ fn_workshop_mods(){
 		fi
 	done
 	# download mods
-	${HOME}/steamcmd/steamcmd.sh +login "${steamlogin}" +force_install_dir ${HOME}/serverfiles ${workshoplist} +quit
+	${HOME}/steamcmd/steamcmd.sh +force_install_dir ${HOME}/serverfiles +login "${steamlogin}" ${workshoplist} +quit
 	# link mods
 	for i in "${workshopID[@]}"
 	do
