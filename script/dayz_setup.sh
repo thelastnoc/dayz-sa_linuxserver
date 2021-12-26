@@ -7,7 +7,7 @@ fi
 # get the distribution of the os
 distroid=$(grep ID /etc/os-release | grep -v _ID | grep -v ID_ | sed 's/ID=//g' | sed 's/\"//g')
 # debian and ubuntu
-if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" || [ "${distroid}" == "pop" ]; then
+if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ] || [ "${distroid}" == "pop" ]; then
         # ubuntu 18 server needs universe repo
         if [ "${distroid}" == "ubuntu" ]; then
                 sudo apt install software-properties-common -y
