@@ -17,7 +17,7 @@ if [ "${distroid}" == "debian" ] || [ "${distroid}" == "ubuntu" ] || [ "${distro
         sudo dpkg --add-architecture i386
         sudo apt install apt-transport-https -y
         sudo apt update
-        sudo apt install tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc wget -y
+        sudo apt install tmux nano htop curl lib32gcc1 libstdc++6 libstdc++6:i386 psmisc wget rename -y
 
 # archlinux
 elif [ "${distroid}" == "arch" ]; then
