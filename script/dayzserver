@@ -73,7 +73,7 @@ fn_loadconfig_dayz(){
 		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
 	fi
 	# battleye config and rconpassword setup
-	if [ ! 0 -lt $(ls ${HOME}/serverfiles/battleye/beserver_x64.cfg 2>/dev/null | wc -w) ]; then
+	if [ ! -f "${HOME}/serverfiles/battleye/beserver_x64.cfg" ]; then
 		wget -P ${HOME}/serverfiles/battleye/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/beserver_x64.cfg
 		passwd=$(openssl rand -base64 8 | tr -dc 'A-Za-z0-9')
 		if [ "${passwd}" == "" ]; then
@@ -327,9 +327,9 @@ fn_workshop_mods(){
 			find "${workshopfolder}/$i" -depth -exec rename -f 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
 		fi
 	done
-	if ls $HOME/serverfiles/@* 1> /dev/null 2>&1; then
+	if ls "${HOME}/serverfiles/@*" 1> /dev/null 2>&1; then
                 printf "\n[ ${green}DayZ${default} ] Copy Key Files from Mods...\n"
-                cp -vu $HOME/serverfiles/@*/keys/* $HOME/serverfiles/keys/ > /dev/null 2>&1
+                cp -vu "${HOME}/serverfiles/@*/keys/*" "${HOME}/serverfiles/keys/" > /dev/null 2>&1
         fi
 }
 
