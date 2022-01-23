@@ -329,7 +329,7 @@ fn_workshop_mods(){
 	done
 	if ls ${HOME}/serverfiles/@* 1> /dev/null 2>&1; then
                 printf "\n[ ${green}DayZ${default} ] Copy Key Files from Mods...\n"
-                cp -vu "${HOME}/serverfiles/@*/keys/*" "${HOME}/serverfiles/keys/" > /dev/null 2>&1
+                cp -vu ${HOME}/serverfiles/@*/keys/* "${HOME}/serverfiles/keys/" > /dev/null 2>&1
         fi
 }
 
