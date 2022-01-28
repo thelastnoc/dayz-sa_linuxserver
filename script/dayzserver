@@ -138,7 +138,8 @@ fn_stop_dayz(){
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Stop Signal.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
-			killall -u $(whoami)
+			tmux kill-session -t $(whoami)-tmux
+			#killall -u $(whoami)
 		fi
 	else
 		printf "[ ${yellow}DayZ${default} ] Server not running.\n"
