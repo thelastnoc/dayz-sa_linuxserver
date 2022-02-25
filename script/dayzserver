@@ -217,11 +217,13 @@ fn_install_dayz(){
 }
 
 fn_runupdate_dayz(){
+	fn_loadconfig_dayz
 	${HOME}/steamcmd/steamcmd.sh +force_install_dir ${HOME}/serverfiles +login "${steamlogin}"  +app_update "${appid}" +quit
 }
 
 fn_update_dayz(){
 	fn_steamlogin_dayz
+	fn_loadconfig_dayz
 	appmanifestfile=${HOME}/serverfiles/steamapps/appmanifest_"${appid}".acf
 	printf "[ ... ] Checking for update: SteamCMD"
 	# gets currentbuild
@@ -281,6 +283,7 @@ fn_update_dayz(){
 }
 
 fn_runvalidate_dayz(){
+	fn_loadconfig_dayz
 	${HOME}/steamcmd/steamcmd.sh +force_install_dir ${HOME}/serverfiles +login "${steamlogin}" +app_update "${appid}" validate +quit
 }
 
@@ -301,6 +304,7 @@ fn_validate_dayz(){
 
 fn_workshop_mods(){
 	fn_steamlogin_dayz
+	fn_loadconfig_dayz
 	declare -a workshopID
 	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100"
 	workshoplist=""
