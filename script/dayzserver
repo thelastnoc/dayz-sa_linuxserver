@@ -432,7 +432,7 @@ done
 
 # Shows LinuxGSM usage
 fn_opt_usage(){
-        printf "\nDayZ 1.15 Exp - Linux Game Server - Version: "${version}""
+        printf "\nDayZ 1.1x Exp - Linux Game Server - Version: "${version}""
 	printf "\nhttps://steamcommunity.com/sharedfiles/filedetails/?id=1517338673"
 	printf "\nUsage:${lightblue} $0 [command]${default}\n\n"
         printf "${lightyellow}Commands${default}\n"
