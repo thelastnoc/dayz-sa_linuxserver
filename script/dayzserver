@@ -396,12 +396,12 @@ fn_config_dayz(){
 	printf "\nFollowing config Files available!\n\\n\t[${yellow}1${default}] - script\t(.dayzserver.cfg)\n\t[${yellow}2${default}] - serverDZ\t(serverDZ.cfg)\n\t[${yellow}3${default}] - workshop\t(.workshop.cfg)\n\t[${yellow}4${default}] - battleye\t(beserver_x64.cfg)\n\t[${yellow}5${default}] - steamlogin\n\t[${yellow}0${default}] - script-default (read only!)\n\t[${yellow}x${default}] - exit\n\n"
 	read -p "Select the config File: " configfile
 	case "$configfile" in
-		1|script) nano -c ${HOME}/.dayzserver.cfg;;
-		2|server|serverDZ) nano -c ${HOME}/serverfiles/serverDZ.cfg;;
-		3|workshop) nano -c ${HOME}/.workshop.cfg && ./dayzserver ws;;
+		1|script) nano -c ${HOME}/config/${instance}/dayzserver.cfg;;
+		2|server|serverDZ) nano -c ${HOME}/config/${instance}/serverDZ.cfg;;
+		3|workshop) nano -c ${HOME}/config/${instance}/workshop.cfg && ./dayzserver ws;;
 		4|battleye) nano -c $(ls ${HOME}/serverfiles/battleye/beserver_x64.cfg);;
-		5|steamlogin) nano -c ${HOME}/.steamlogin;;
-		0|default) nano -cv ${HOME}/.default.cfg;;
+		5|steamlogin) nano -c ${HOME}/config/.steamlogin;;
+		0|default) nano -cv ${HOME}/config/.default.cfg;;
 		*) exit 1
 	esac
 }
