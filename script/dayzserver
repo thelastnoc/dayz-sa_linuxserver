@@ -7,10 +7,7 @@
 #############################################
 
 version=26
-appid=1042420
-dayz_id=221100
-#stable=223350
-#exp_branch=1042420
+instance=dayzserver
 
 if [ "${ansi}" != "off" ]; then
         # echo colors
@@ -52,25 +49,31 @@ fn_checkscreen(){
 }
 
 fn_loadconfig_dayz(){
+	# config folder
+	if [ ! -d "${HOME}/config" ] || [ ! -d "${HOME}/config/${instance}" ] || [ ! -d "${HOME}/config/${instance}/profile" ]; then
+		mkdir ${HOME}/config &> /dev/null
+		mkdir ${HOME}/config/${instance} &> /dev/null
+		mkdir ${HOME}/config/${instance}/profile &> /dev/null
+	fi
 	# default config
-	if [ ! -f "${HOME}/.default.cfg" ]; then
-		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
+	if [ ! -f "${HOME}/config/.default.cfg" ]; then
+		wget -P ${HOME}/config/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.default.cfg
 	fi
-	source ${HOME}/.default.cfg
+	source ${HOME}/config/.default.cfg
 	# script config
-	if [ ! -f "${HOME}/.dayzserver.cfg" ] || [ "$(grep dayzparameter ${HOME}/.dayzserver.cfg)" == "" ]; then
-                cp ${HOME}/.default.cfg ${HOME}/.dayzserver.cfg
+	if [ ! -f "${HOME}/config/${instance}/dayzserver.cfg" ] || [ "$(grep dayzparameter ${HOME}/config/${instance}/dayzserver.cfg)" == "" ]; then
+                cp ${HOME}/config/.default.cfg ${HOME}/config/${instance}/dayzserver.cfg
         fi
-	source ${HOME}/.dayzserver.cfg
+	source ${HOME}/config/${instance}/dayzserver.cfg
 	# hostname/servername
-	if [ ! -f "${HOME}/serverfiles/serverDZ.cfg" ]; then
-		wget -P ${HOME}/serverfiles/ -q https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/serverDZ.cfg
+	if [ ! -f "${HOME}/config/${instance}/serverDZ.cfg" ]; then
+		wget -P ${HOME}/config/${instance}/ -q https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/serverDZ.cfg
 	fi
-	defaultservername=$(grep -rwi ${HOME}/serverfiles/serverDZ.cfg -e 'EXAMPLE NAME')
+	defaultservername=$(grep -rwi ${HOME}/config/${instance}/serverDZ.cfg -e 'EXAMPLE NAME')
 	if [ "${defaultservername}" != "" ]; then
 		printf "[ ${magenta}SERVER${default} ] Servername is set on default! 'EXAMPLE NAME'\n\n"
 		read -p "Enter a new Servername: " servername
-		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/serverfiles/serverDZ.cfg"
+		sed -i "/hostname/ s/EXAMPLE NAME/${servername}/" "${HOME}/config/${instance}/serverDZ.cfg"
 	fi
 	# battleye config and rconpassword setup
 	if [ ! -f "${HOME}/serverfiles/battleye/beserver_x64.cfg" ]; then
@@ -90,13 +93,13 @@ fn_loadconfig_dayz(){
 		fi
 	fi
 	# workshop
-	if [ ! -f "${HOME}/.workshop.cfg" ]; then
-		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.workshop.cfg
+	if [ ! -f "${HOME}/config/${instance}/workshop.cfg" ]; then
+		wget -P ${HOME}/config/${instance}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/workshop.cfg
 	fi
 }
 
 fn_status_dayz(){
-	dayzstatus=$(tmux list-sessions -F $(whoami)-tmux 2> /dev/null | grep -Ecx $(whoami)-tmux)
+	dayzstatus=$(tmux list-sessions -F tmux-${whoami}-${instance} 2> /dev/null | grep -Ecx tmux-${whoami}-${instance})
 }
 
 fn_start_dayz(){
@@ -110,7 +113,7 @@ fn_start_dayz(){
 		fn_loadconfig_dayz
 		sleep 0.5
 		cd ${HOME}/serverfiles
-		tmux new-session -d -x 23 -y 80 -s $(whoami)-tmux ./DayZServer $dayzparameter "$workshop"
+		tmux new-session -d -x 23 -y 80 -s tmux-${whoami}-${instance} ./DayZServer $dayzparameter "$workshop"
 		sleep 1
 		cd ${HOME}
 		date > ${HOME}/.dayzlockfile
@@ -130,7 +133,7 @@ fn_stop_dayz(){
 				break
 			fi
 			printf "\r[ ${magenta}...${default} ] Stopping Server graceful: ${seconds} seconds"
-			tmux send-keys C-c -t $(whoami)-tmux > /dev/null 2>&1
+			tmux send-keys C-c -t tmux-${whoami}-${instance} > /dev/null 2>&1
 			sleep 1
 		done
 		fn_status_dayz
@@ -138,7 +141,7 @@ fn_stop_dayz(){
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Stop Signal.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
-			tmux kill-session -t $(whoami)-tmux
+			tmux kill-session -t tmux-${whoami}-${instance}
 			#killall -u $(whoami)
 		fi
 	else
@@ -182,17 +185,18 @@ fn_console_dayz(){
 }
 
 fn_steamlogin_dayz(){
-	if [ ! -f "${HOME}/.steamlogin" ]; then
-		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
+	if [ ! -f "${HOME}/config/.steamlogin" ]; then
+		mkdir ${HOME}/config/ &> /dev/null
+		wget -P ${HOME}/config/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.steamlogin
 	fi
-	source ${HOME}/.steamlogin
+	source ${HOME}/config/.steamlogin
 	if [ "${steamlogin}" == "" ]; then
 		printf "\n[ ${magenta}STEAM${default} ] "
 		read -p "Please type in your Steamlogin (username): " steamname
 		sleep 0.5
-		sed -i "/steamlogin/ s/=/=$steamname/" ${HOME}/.steamlogin
+		sed -i "/steamlogin/ s/=/=$steamname/" ${HOME}/config/.steamlogin
 		sleep 0.5
-		source ${HOME}/.steamlogin
+		source ${HOME}/config/.steamlogin
 	fi
 }
 
@@ -206,7 +210,6 @@ fn_install_dayz(){
 	fi
 	if [ ! -f "${HOME}/serverfiles/DayZServer" ]; then
 		mkdir ${HOME}/serverfiles &> /dev/null
-		mkdir ${HOME}/serverprofile &> /dev/null
 		printf "[ ${yellow}DayZ${default} ] Downloading DayZ Server-Files!\n"
 		fn_steamlogin_dayz
 		fn_runvalidate_dayz
@@ -308,10 +311,10 @@ fn_workshop_mods(){
 	declare -a workshopID
 	workshopfolder="${HOME}/serverfiles/steamapps/workshop/content/221100"
 	workshoplist=""
-	if [ ! -f "${HOME}/.workshop.cfg" ]; then
-		wget -P ${HOME}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/.workshop.cfg
+	if [ ! -f "${HOME}/config/${instance}/workshop.cfg" ]; then
+		wget -P ${HOME}/config/${instance}/ -qN https://raw.githubusercontent.com/thelastnoc/dayz-sa_linuxserver/master/script/workshop.cfg
 	fi
-	mapfile -t -s 4 workshopID < "${HOME}/.workshop.cfg"
+	mapfile -t -s 4 workshopID < "${HOME}/config/${instance}/.workshop.cfg"
 	# gather mods
 	for i in "${workshopID[@]}"
 	do
@@ -341,9 +344,9 @@ fn_workshop_mods(){
 fn_backup_dayz(){
 	fn_status_dayz
 	if [ ! -d "${HOME}/backup" ]; then
-			mkdir ${HOME}/backup &> /dev/null
+		mkdir ${HOME}/backup &> /dev/null
 	fi
-	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	missionfolder=$(grep template ${HOME}/config/${instance}/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	if [ "${dayzstatus}" == "0" ]; then
 		printf "[ ${green}DayZ${default} ] Creating backup of Missionfolder: ${cyan}${missionfolder}${default}\n"
 		tar -cf ${HOME}/backup/${missionfolder}-$(date +%Y-%m-%d).tar ${HOME}/serverfiles/mpmissions/${missionfolder}
@@ -357,7 +360,7 @@ fn_backup_dayz(){
 }
 
 fn_wipe_dayz(){
-	missionfolder=$(grep template ${HOME}/serverfiles/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
+	missionfolder=$(grep template ${HOME}/config/${instance}/serverDZ.cfg | tr '[:blank:]"' ' ' | tr -s ' ' | cut -d \  -f3)
 	printf "[ ${red}WARNING${default} ] Wiping Players and reset Central Economy state from...\n"
 	for seconds in {9..0}; do
 		printf "\r\t    Selected Mission: ${cyan}${missionfolder}${default} in ${red}"${seconds}"${default} seconds."
@@ -455,6 +458,9 @@ fn_checktmux
 fn_checkscreen
 
 getopt=$1
+if [ $2 != "" &> /dev/null ]; then
+	instance=$2
+fi
 if [ ! -f "${HOME}/steamcmd/steamcmd.sh" ] || [ ! -f "${HOME}/serverfiles/DayZServer" ] && [ "${getopt}" != "cfg" ]; then
 	printf "[ ${yellow}INFO${default} ] No installed steamcmd and/or serverfiles found!\n"
 	chmod u+x ${HOME}/dayzserver
