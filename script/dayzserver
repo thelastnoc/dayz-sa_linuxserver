@@ -99,12 +99,13 @@ fn_loadconfig_dayz(){
 }
 
 fn_status_dayz(){
-	dayzstatus=$(tmux list-sessions -F tmux-$(whoami)-${instance} 2> /dev/null | grep -Ecx tmux-$(whoami)-${instance})
+	#dayzstatus=$(tmux list-sessions -F tmux-$(whoami)-${instance} 2> /dev/null | grep -Ecx tmux-$(whoami)-${instance})
+	tmux has-session -t "tmux-$(whoami)-${instance}" 2> /dev/null
 }
 
 fn_start_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ]; then
+	if [ $? == 0 ]; then
 		printf "[ ${yellow}DayZ${default} ] Server already running.\n"
 		exit 1
 	else
@@ -122,7 +123,7 @@ fn_start_dayz(){
 
 fn_stop_dayz(){
 	fn_status_dayz
-	if [ "${dayzstatus}" == "1" ]; then
+	if [ $? == 0 ]; then
 		printf "[ ${magenta}...${default} ] Stopping Server graceful."
 		# waits up to 60 seconds giving the server time to shutdown gracefuly
 		for seconds in {1..60}; do
@@ -137,7 +138,7 @@ fn_stop_dayz(){
 			sleep 1
 		done
 		fn_status_dayz
-		if [ "${dayzstatus}" != "0" ]; then
+		if [ $? == 0 ]; then
 			printf "\n[ ${red}FAIL${default} ] Stopping Server graceful failed. Stop Signal.\n"
 			sleep 2
 			rm -f ${HOME}/.dayzlockfile
